@@ -1,0 +1,154 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  font-family: Roboto; 
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Roboto Regular'), 
+       local('Roboto-Regular'), 
+       url(http://themes.googleusercontent.com/static/fonts/roboto/v11/2UX7WLTfW3W8TclTUvlFyQ.woff) 
+       format('woff');
+}
+
+.nav-btn:focus {
+  outline: none;
+  outline-offset: none;
+  box-shadow: none;
+}
+
+.nav-btn{
+  border-radius: 50%;
+}
+
+.top-brand{
+  padding-left: 10px;
+}
+
+.react-icons {
+  vertical-align: middle;
+}
+
+.sidebar{
+  position : fixed;
+  left: 0;
+  top: 56px;
+  height: 100vh;
+}
+
+.sidebar-collapse{
+  transition: width 0.35s ease;
+  width: 0;
+}
+
+.sidebar-open {
+  transition: width 0.35s ease;
+  width: 200px;
+}
+
+.center-text{
+  text-align: center;
+  color: white;
+}
+
+.navbar{
+  position : fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.content{
+  padding-top: 100px;
+  padding-left: 50px;
+  padding-right: 50px; 
+  transition: margin-left 0.35s ease;
+  margin-left: 0px;
+}
+
+.content-shift{
+  padding-top: 100px;
+  padding-left: 50px;
+  padding-right: 50px; 
+  transition: margin-left 0.35s ease;
+  margin-left: 275px;
+}
+
+.content-shift-collapsed{
+  padding-top: 100px;
+  padding-left: 50px;
+  padding-right: 50px; 
+  transition: margin-left 0.35s ease;
+  margin-left: 50px;
+}
+
+body {
+  background-color: #303030;
+}
+
+h1{
+  font-family: Roboto;
+  color: white;
+}
+
+h2{
+  font-family: Roboto;
+  color: white;
+}
+
+h3{
+  font-family: Roboto;
+  color: white;
+}
+
+p{
+  font-family: Roboto;
+  color: white;
+}
+
+.dark1{
+  background-color: #212121;
+}
+
+.my-table{
+  background-color: #343a40;
+  font-family: Roboto;
+  color: white;
+}

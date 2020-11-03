@@ -23,7 +23,7 @@ function initModels(sequelize) {
     Weapons,
     UserWeapons,
     UserCharacters,
-    Characters,
+    Characters
   };
 }
 module.exports = { initModels };

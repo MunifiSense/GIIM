@@ -29,15 +29,23 @@ module.exports = function(sequelize, DataTypes) {
     },
     level: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     },
     desired_Level: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     },
     ascended: {
       type: DataTypes.INTEGER(1),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 0
+    },
+    managed: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false,
+      defaultValue: 0
     }
   }, {
     sequelize,

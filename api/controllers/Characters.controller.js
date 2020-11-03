@@ -1,10 +1,10 @@
 const db = require("../models");
-const Character = db.Characters;
+const Characters = db.Characters;
 const Op = db.Sequelize.Op;
 
 exports.getCharacter = (req, res) => {
     const name = req.params.name;
-    Character.findAll({where: {
+    Characters.findAll({where: {
         name : name
     }})
         .then(data => {
@@ -19,7 +19,7 @@ exports.getCharacter = (req, res) => {
 };
 
 exports.getAllCharacters = (req, res) => {
-    Character.findAll()
+    Characters.findAll()
         .then(data => {
             res.send(data);
         })

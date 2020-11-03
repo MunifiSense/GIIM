@@ -4,6 +4,7 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('UserCharacters', {
     user_character_id: {
+      autoIncrement: true,
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true
@@ -28,39 +29,53 @@ module.exports = function(sequelize, DataTypes) {
     },
     level: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     },
     desired_level: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     },
     ascended: {
       type: DataTypes.INTEGER(1),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 0
+    },
+    managed: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false,
+      defaultValue: 0
     },
     normal_atk_level: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     },
     normal_atk_desired_level: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     },
     q_atk_level: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     },
     q_atk_desired_level: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     },
     e_atk_level: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     },
     e_atk_desired_level: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     }
   }, {
     sequelize,
