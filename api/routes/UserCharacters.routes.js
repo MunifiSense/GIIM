@@ -13,7 +13,7 @@ module.exports = app => {
     router.put("/", userCharacters.updateUserCharacter);
 
     // Delete character with user id
-    router.delete("/", userCharacters.removeUserCharacter);
+    router.delete("/:id", userCharacters.removeUserCharacter);
   
     app.use('/api/usercharacters', router);
   };

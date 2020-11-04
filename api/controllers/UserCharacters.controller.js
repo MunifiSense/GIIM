@@ -1,7 +1,7 @@
 const db = require("../models");
-const UserCharacters = require("../models/UserCharacters");
 const Users = db.Users;
 const Characters = db.Characters;
+const UserCharacters = db.UserCharacters;
 const Op = db.Sequelize.Op;
 
 exports.getUserCharacters = (req, res) => {
@@ -64,18 +64,18 @@ exports.updateUserCharacter = (req, res) => {
         return;
     }
     const userid = req.body.userid;
-    const charid = req.body.usercharinfo.charid;
+    const charid = req.body.charid;
     const userCharacter = {
-        level: req.body.usercharinfo.level,
-        desired_level: req.body.usercharinfo.desired_level,
-        ascended: req.body.usercharinfo.ascended,
-        managed: req.body.usercharinfo.managed,
-        normal_atk_level: req.body.usercharinfo.normal_atk_level,
-        normal_atk_desired__level: req.body.usercharinfo.normal_atk_desired__level,
-        q_atk_level: req.body.usercharinfo.q_atk_level,
-        q_atk_desired_level: req.body.usercharinfo.q_atk_desired_level,
-        e_atk_level: req.body.usercharinfo.e_atk_level,
-        e_atk_desired_level: req.body.usercharinfo.e_atk_desired_level
+        level: req.body.level,
+        desired_level: req.body.desired_level,
+        ascended: req.body.ascended,
+        managed: req.body.managed,
+        normal_atk_level: req.body.normal_atk_level,
+        normal_atk_desired__level: req.body.normal_atk_desired__level,
+        q_atk_level: req.body.q_atk_level,
+        q_atk_desired_level: req.body.q_atk_desired_level,
+        e_atk_level: req.body.e_atk_level,
+        e_atk_desired_level: req.body.e_atk_desired_level
     };
 
     UserCharacters.update(
@@ -99,16 +99,8 @@ exports.updateUserCharacter = (req, res) => {
 };
 
 exports.removeUserCharacter = (req, res) => {
-    // Validate request
-    if (!req.body.userid) {
-        res.status(400).send({
-            message: "Content can not be empty!"
-        });
-        return;
-    }
-
-    const userid = req.body.userid;
-    const charid = req.body.charid;
+    const userid = req.params.id;
+    const charid = req.query.charid
 
     UserCharacters.destroy({where: {
         user_id: userid,

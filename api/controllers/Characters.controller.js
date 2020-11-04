@@ -19,7 +19,10 @@ exports.getCharacter = (req, res) => {
 };
 
 exports.getAllCharacters = (req, res) => {
-    Characters.findAll()
+    Characters.findAll({
+        order: [
+            ['name', 'ASC']
+        ]})
         .then(data => {
             res.send(data);
         })

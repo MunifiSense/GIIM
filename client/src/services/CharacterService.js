@@ -20,6 +20,6 @@ export function updateUserCharacter(data){
   return http.put(`/usercharacters`, data);
 }
 
-export function removeUserCharacter(data){
-  return http.delete(`/usercharacters`, data);
+export function removeUserCharacter(id, charid){
+  return http.delete(`/usercharacters/${id}?charid=${charid}`);
 }
