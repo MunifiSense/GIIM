@@ -25,6 +25,8 @@ app.get("/", (req, res) => {
 
 require("./routes/Characters.routes")(app);
 require("./routes/UserCharacters.routes")(app);
+require("./routes/Weapons.routes")(app);
+require("./routes/UserWeapons.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 9000;

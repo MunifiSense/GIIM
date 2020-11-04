@@ -2,6 +2,7 @@ import React from "react";
 import { ProSidebar, Menu, MenuItem, SidebarContent} from 'react-pro-sidebar';
 import { IconContext } from 'react-icons';
 import { FaBars, FaGem, FaHeart } from 'react-icons/fa';
+import { GiTargetArrows } from 'react-icons/gi';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { GrDomain } from 'react-icons/gr';
@@ -15,6 +16,7 @@ import "./App.css";
 
 import Home from "./components/Main";
 import Characters from "./components/Characters";
+import Weapons from "./components/Weapons";
 
 import Collapse from "react-bootstrap/esm/Collapse";
 
@@ -56,8 +58,12 @@ function App (){
                         Team Roster
                         <Link to ="/team"/>
                       </MenuItem>
-                      <MenuItem icon={<RiSwordFill />}>Weapon Roster</MenuItem>
+                      <MenuItem icon={<RiSwordFill />}>
+                        Weapon Roster
+                        <Link to ="/weapons"/>
+                      </MenuItem>
                       <MenuItem icon={<FaGem />}>Item Inventory</MenuItem>
+                      <MenuItem icon={<GiTargetArrows />}>Needed Items</MenuItem>
                       <MenuItem icon={<FaHeart />}>Suggestions</MenuItem>
                     </Menu>
                   </SidebarContent>
@@ -71,6 +77,7 @@ function App (){
         <Switch>
             <Route exact path="/" component={Home} />
             <Route exact path="/team" component={Characters} />
+            <Route exact path="/weapons" component={Weapons} />
         </Switch>
         </div>
       </>

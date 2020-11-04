@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {addUserCharacter, getAllCharacters, getUserCharacters, updateUserCharacter, removeUserCharacter} from "../services/CharacterService";
+import {addUserWeapon, getAllWeapons, getUserWeapons, updateUserWeapon, removeUserWeapon} from "../services/WeaponService";
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
@@ -15,17 +15,17 @@ import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 const { SearchBar } = Search;
 
-function Characters(){
-    const [characters, setCharacters] = useState([]);
-    const [userCharacters, setUserCharacters] = useState([]);
-    const [characterData, setCharacterData] = useState([]);
+function Weapons(){
+    const [weapons, setWeapons] = useState([]);
+    const [userWeapons, setUserWeapons] = useState([]);
+    const [weaponData, setWeaponData] = useState([]);
     const id = 1;
     const selectOptions = {
         0: '-',
         1: '✓'
     };
     const columns = [{
-        dataField: `character_id`,
+        dataField: `weapon_id`,
         hidden: true
     }, {
         dataField: `name`,
@@ -34,18 +34,18 @@ function Characters(){
         sortCaret: sortingThing,
         editable: false
     },{
-        dataField: `Users[0].UserCharacters.level`,
+        dataField: `Users[0].UserWeapons.level`,
         text: `Level`,
         sort: true,
         sortCaret: sortingThing
     },{
-        dataField: `Users[0].UserCharacters.desired_level`,
+        dataField: `Users[0].UserWeapons.desired_level`,
         text: `Desired Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkLevel
     },{
-        dataField: `Users[0].UserCharacters.ascended`,
+        dataField: `Users[0].UserWeapons.ascended`,
         text: `Ascended`,
         editor: {
             type: Type.CHECKBOX,
@@ -59,43 +59,43 @@ function Characters(){
         sort: true,
         sortCaret: sortingThing
     },{
-        dataField: `Users[0].UserCharacters.normal_atk_level`,
+        dataField: `Users[0].UserWeapons.normal_atk_level`,
         text: `Normal Attack Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkTalent
     },{
-        dataField: `Users[0].UserCharacters.normal_atk_desired_level`,
+        dataField: `Users[0].UserWeapons.normal_atk_desired_level`,
         text: `Normal Attack Desired Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkTalent
     },{
-        dataField: `Users[0].UserCharacters.q_atk_level`,
+        dataField: `Users[0].UserWeapons.q_atk_level`,
         text: `Q Attack Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkTalent
     },{
-        dataField: `Users[0].UserCharacters.q_atk_desired_level`,
+        dataField: `Users[0].UserWeapons.q_atk_desired_level`,
         text: `Q Attack Desired Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkTalent
     },{
-        dataField: `Users[0].UserCharacters.e_atk_level`,
+        dataField: `Users[0].UserWeapons.e_atk_level`,
         text: `E Attack Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkTalent
     },{
-        dataField: `Users[0].UserCharacters.e_atk_desired_level`,
+        dataField: `Users[0].UserWeapons.e_atk_desired_level`,
         text: `E Attack Desired Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkTalent
     },{
-        dataField: `Users[0].UserCharacters.managed`,
+        dataField: `Users[0].UserWeapons.managed`,
         text: `Managed`,
         editor: {
             type: Type.CHECKBOX,
@@ -189,85 +189,79 @@ function Characters(){
     }
 
     useEffect(() =>{
-        retrieveCharactersInfo();
-        retrieveUserCharacters();
+        retrieveWeaponsInfo();
+        retrieveUserWeapons();
     }, []);
 
-    function retrieveCharactersInfo(){
-        getAllCharacters().then(response => {
-            setCharacters(response.data);
+    function retrieveWeaponsInfo(){
+        getAllWeapons().then(response => {
+            setWeapons(response.data);
             console.log(response.data);
         }).catch(e => {
             console.log(e);
         });
     };
 
-    function retrieveUserCharacters(){
-        getUserCharacters(id).then(response => {
-            setUserCharacters(response.data);
+    function retrieveUserWeapons(){
+        getUserWeapons(id).then(response => {
+            setUserWeapons(response.data);
             console.log(response.data);
         }).catch(e => {
             console.log(e);
         });
     };
 
-    function AddUserCharacter(cid){
+    function AddUserWeapon(cid){
         const data ={
             userid: id,
-            charid: cid
+            weaponid: cid
         };
-        addUserCharacter(data)
+        addUserWeapon(data)
         .then(response => {
             console.log(response.data);
-            console.log("The user character was added successfully!");
-            retrieveCharactersInfo();
-            retrieveUserCharacters();
+            console.log("The user weapon was added successfully!");
+            retrieveWeaponsInfo();
+            retrieveUserWeapons();
         })
         .catch(e => {
             console.log(e);
         });
     };
 
-    function UpdateUserCharacter(value){
+    function UpdateUserWeapon(value){
         const data ={
             userid: id,
-            charid: value.character_id,
+            weaponid: value.weapon_id,
             level: value.level,
             desired_level: value.desired_level,
             ascended: value.ascended,
-            normal_atk_level: value.normal_atk_level,
-            normal_atk_desired_level: value.normal_atk_desired_level,
-            q_atk_level: value.q_atk_level,
-            q_atk_desired_level: value.q_atk_desired_level,
-            e_atk_level: value.e_atk_level,
-            e_atk_desired_level: value.e_atk_desired_level,
             managed: value.managed
         };
-        updateUserCharacter(data)
+        updateUserWeapon(data)
         .then(response => {
             console.log(response.data);
-            console.log("The user character was updated successfully!");
+            console.log("The user weapon was updated successfully!");
         })
         .catch(e => {
             console.log(e);
         });
     }; 
 
-    function RemoveUserCharacter(cid){
-        removeUserCharacter(id, cid)
+    function RemoveUserWeapon(cid){
+        removeUserWeapon(id, cid)
         .then(response => {
             console.log(response.data);
-            retrieveCharactersInfo();
-            retrieveUserCharacters();
-            console.log("The user character was removed successfully!");
+            retrieveWeaponsInfo();
+            retrieveUserWeapons();
+            console.log("The user weapon was removed successfully!");
         })
         .catch(e => {
             console.log(e);
         });
     };
 
-    function IsCharNotAdded(value){
-        return !userCharacters.some(userChar => userChar.character_id === value.character_id);
+    function IsWeaponNotAdded(value){
+        return !userWeapons.some(userWeapon => userWeapon.weapon_id === value.weapon_id);
     }
 
     function boolFormatter(cell, row, rowIndex, formatExtraData) {
@@ -277,22 +271,22 @@ function Characters(){
     }
 
     function saveChanged(){
-        characterData.forEach(UpdateUserCharacter);
-        setCharacterData([]);
+        weaponData.forEach(UpdateUserWeapon);
+        setWeaponData([]);
     }
 
     return(
         <Container fluid>
             <Row className="justify-content-md-center" >
-                <h1>Team Roster</h1>
+                <h1>Weapon Roster</h1>
             </Row>
             <Row className="justify-content-md-center">
                 <p>Click a cell to edit!</p>
             </Row>
             <Row className="justify-content-md-center">
                 <ToolkitProvider
-                    keyField="character_id"
-                    data={ userCharacters }
+                    keyField="weapon_id"
+                    data={ userWeapons }
                     columns={ columns }
                     search
                 >{
@@ -305,13 +299,13 @@ function Characters(){
                                     mode: 'click',
                                     blurToSave: true,
                                     afterSaveCell: (oldValue, newValue, row, column) => {
-                                        var indexOfChar = characterData.findIndex(userChar => userChar.character_id === row.Users[0].UserCharacters.character_id);
-                                        if(indexOfChar !== -1){
-                                            characterData[indexOfChar] = row.Users[0].UserCharacters;
+                                        var indexOfWeapon = weaponData.findIndex(userWeapon => userWeapon.weapon_id === row.Users[0].UserWeapons.weapon_id);
+                                        if(indexOfWeapon !== -1){
+                                            weaponData[indexOfWeapon] = row.Users[0].UserWeapons;
                                         }else{
-                                            characterData.push(row.Users[0].UserCharacters)
+                                            weaponData.push(row.Users[0].UserWeapons)
                                         }
-                                        setCharacterData(characterData);
+                                        setWeaponData(weaponData);
                                     }
                                 })}
                                 defaultSorted = {defaultSorted} 
@@ -330,17 +324,17 @@ function Characters(){
                     <div>
                         <Select 
                             className="my-dropdown"
-                            options={characters.filter(IsCharNotAdded)} 
+                            options={weapons.filter(IsWeaponNotAdded)} 
                             values={[]} 
-                            valueField="character_id" 
+                            valueField="weapon_id" 
                             labelField="name" 
                             searchBy="name" 
                             sortBy="name"
                             onChange={
-                                (value) => AddUserCharacter(value)
+                                (value) => AddUserWeapon(value)
                             }
                             closeOnSelect
-                            placeholder="Select character to add..."
+                            placeholder="Select weapon to add..."
                             dropdownGap = {-2}
                             style={{width: '300px !important', paddingRight: '10px'}}
                         />
@@ -348,24 +342,24 @@ function Characters(){
                     <div style={{paddingLeft: '10px'}}>
                         <Select
                             className="my-dropdown" 
-                            options={userCharacters} 
+                            options={userWeapons} 
                             values={[]} 
-                            valueField="character_id" 
+                            valueField="weapon_id" 
                             labelField="name" 
                             searchBy="name" 
                             sortBy="name" 
                             onChange={
-                                (value) => RemoveUserCharacter(value)
+                                (value) => RemoveUserWeapon(value)
                             }
                             closeOnSelect
-                            placeholder="Select character to remove..."
+                            placeholder="Select weapon to remove..."
                             style={{width: '300px !important', paddingLeft: '10px'}}
                             dropdownGap = {-2}
                         />
                     </div>
                 </div>
                 <div>
-                    <Button variant="primary" onClick={() => saveChanged()} disabled={!(characterData.length > 0)}>
+                    <Button variant="primary" onClick={() => saveChanged()} disabled={!(weaponData.length > 0)}>
                             Save
                     </Button>
                 </div>
@@ -374,4 +368,4 @@ function Characters(){
     );
 };
 
-export default Characters;
+export default Weapons;
