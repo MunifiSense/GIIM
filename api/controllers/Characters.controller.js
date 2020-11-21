@@ -4,7 +4,7 @@ const Op = db.Sequelize.Op;
 
 exports.getCharacter = (req, res) => {
     const name = req.params.name;
-    Characters.findAll({where: {
+    Characters.findOne({where: {
         name : name
     }})
         .then(data => {

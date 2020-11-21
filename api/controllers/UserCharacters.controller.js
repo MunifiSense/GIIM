@@ -69,6 +69,7 @@ exports.updateUserCharacter = (req, res) => {
         level: req.body.level,
         desired_level: req.body.desired_level,
         ascended: req.body.ascended,
+        ascend_next_max: req.body.ascend_next_max,
         managed: req.body.managed,
         normal_atk_level: req.body.normal_atk_level,
         normal_atk_desired__level: req.body.normal_atk_desired__level,
@@ -124,4 +125,4 @@ exports.removeUserCharacter = (req, res) => {
                 err.message || "Some error occured while deleting the character for the user."
         });
     })
-}
+};

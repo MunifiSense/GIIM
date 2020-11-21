@@ -42,6 +42,8 @@ exports.addUserWeapon = (req, res) => {
         weapon_id: req.body.weaponid
     };
 
+    console.log(userWeapon);
+
     // Save user weapon
     UserWeapons.create(userWeapon)
         .then(data => {
@@ -118,4 +120,4 @@ exports.removeUserWeapon = (req, res) => {
                 err.message || "Some error occured while deleting the Weapon for the user."
         });
     })
-}
+};

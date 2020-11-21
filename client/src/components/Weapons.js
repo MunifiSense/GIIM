@@ -3,6 +3,9 @@ import {addUserWeapon, getAllWeapons, getUserWeapons, updateUserWeapon, removeUs
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
+import Modal from 'react-bootstrap/Modal';
+import Image from 'react-bootstrap/Image';
+import Spinner from 'react-bootstrap/Spinner';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import BootstrapTable from 'react-bootstrap-table-next';
 import { Type } from 'react-bootstrap-table2-editor';
@@ -19,6 +22,11 @@ function Weapons(){
     const [weapons, setWeapons] = useState([]);
     const [userWeapons, setUserWeapons] = useState([]);
     const [weaponData, setWeaponData] = useState([]);
+    const [changed, setChanged] = useState(false);
+    const [show, setShow] = useState(false);
+    const [toBeDeleted, setToBeDeleted] = useState({});
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
     const id = 1;
     const selectOptions = {
         0: '-',
@@ -29,21 +37,29 @@ function Weapons(){
         hidden: true
     }, {
         dataField: `name`,
-        text: `Name`,
+        text: `Weapon`,
         sort: true,
         sortCaret: sortingThing,
-        editable: false
+        editable: false,
+        formatter: imageFormatter,
+        style: {borderRight: '1px solid white', width: '300px'},
+        headerStyle: {borderRight: '1px solid white', width: '300px'}
     },{
         dataField: `Users[0].UserWeapons.level`,
         text: `Level`,
         sort: true,
-        sortCaret: sortingThing
+        sortCaret: sortingThing,
+        validator: checkLevel,
+        style: {backgroundColor: '#303030'},
+        headerStyle: {backgroundColor: '#303030'}
     },{
         dataField: `Users[0].UserWeapons.desired_level`,
         text: `Desired Level`,
         sort: true,
         sortCaret: sortingThing,
-        validator: checkLevel
+        validator: checkDesiredLevel,
+        style: {backgroundColor: '#303030'},
+        headerStyle: {backgroundColor: '#303030'}
     },{
         dataField: `Users[0].UserWeapons.ascended`,
         text: `Ascended`,
@@ -57,43 +73,9 @@ function Weapons(){
             1: '✓'
         },
         sort: true,
-        sortCaret: sortingThing
-    },{
-        dataField: `Users[0].UserWeapons.normal_atk_level`,
-        text: `Normal Attack Level`,
-        sort: true,
         sortCaret: sortingThing,
-        validator: checkTalent
-    },{
-        dataField: `Users[0].UserWeapons.normal_atk_desired_level`,
-        text: `Normal Attack Desired Level`,
-        sort: true,
-        sortCaret: sortingThing,
-        validator: checkTalent
-    },{
-        dataField: `Users[0].UserWeapons.q_atk_level`,
-        text: `Q Attack Level`,
-        sort: true,
-        sortCaret: sortingThing,
-        validator: checkTalent
-    },{
-        dataField: `Users[0].UserWeapons.q_atk_desired_level`,
-        text: `Q Attack Desired Level`,
-        sort: true,
-        sortCaret: sortingThing,
-        validator: checkTalent
-    },{
-        dataField: `Users[0].UserWeapons.e_atk_level`,
-        text: `E Attack Level`,
-        sort: true,
-        sortCaret: sortingThing,
-        validator: checkTalent
-    },{
-        dataField: `Users[0].UserWeapons.e_atk_desired_level`,
-        text: `E Attack Desired Level`,
-        sort: true,
-        sortCaret: sortingThing,
-        validator: checkTalent
+        style: {backgroundColor: '#303030'},
+        headerStyle: {backgroundColor: '#303030'}
     },{
         dataField: `Users[0].UserWeapons.managed`,
         text: `Managed`,
@@ -107,10 +89,13 @@ function Weapons(){
             1: '✓'
         },
         sort: true,
+        style: {backgroundColor: '#303030'},
+        headerStyle: {backgroundColor: '#303030'},
         sortCaret: sortingThing,
         filter: selectFilter({
             options: selectOptions,
-            placeholder: 'Any'
+            placeholder: 'Any',
+            defaultValue: 1
         })
     }];
 
@@ -163,26 +148,36 @@ function Weapons(){
                 message: 'Level should not be lower than 1'
             };
         }
+        else if(newValue > row.Users[0].UserWeapons.desired_level){
+            row.Users[0].UserWeapons.desired_level = newValue;
+            return true;
+        }
         return true;
     }
 
-    function checkTalent(newValue, row, column){
+    function checkDesiredLevel(newValue, row, column){
         if (isNaN(newValue)) {
             return {
               valid: false,
-              message: 'Talent level should be numeric'
+              message: 'Desired level should be numeric'
             };
         }
-        else if (newValue > 10) {
+        else if (newValue > 90) {
             return {
                 valid: false,
-                message: 'Talent level should not be higher than 10'
+                message: 'Desired level should not be higher than 90'
             };
         }
         else if(newValue < 1){
             return {
                 valid: false,
-                message: 'Talent level should not be lower than 1'
+                message: 'Desired level should not be lower than 1'
+            };
+        }
+        else if(newValue < row.Users[0].UserWeapons.level){
+            return {
+                valid: false,
+                message: 'Desired level should be higher than level'
             };
         }
         return true;
@@ -220,7 +215,6 @@ function Weapons(){
         .then(response => {
             console.log(response.data);
             console.log("The user weapon was added successfully!");
-            retrieveWeaponsInfo();
             retrieveUserWeapons();
         })
         .catch(e => {
@@ -271,16 +265,60 @@ function Weapons(){
     }
 
     function saveChanged(){
+        setChanged(false);
         weaponData.forEach(UpdateUserWeapon);
         setWeaponData([]);
     }
 
+    function imageFormatter(cell, row, rowIndex, formatExtraData) {
+        return(
+        <span>
+            <Image src={'https://muni.moe/images/genshin/Weapon_'+cell.replace(/ /g, '_').replace(/'/g,'%27')+'.png'} style={{height: '64px', width: '64px', marginRight: "10px", display: 'inline-block', verticalAlign: 'middle'}}/>
+            <p style={{display: 'inline-block'}}>{cell}</p>
+            
+        </span>
+        )
+    }
+
     return(
-        <Container fluid>
-            <Row className="justify-content-md-center" >
+        <>
+        <Container fluid className='table-container'>
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+                size="lg"
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Deleting Weapon
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to remove {toBeDeleted.name} from your roster?
+                    <br></br>Doing so will wipe all data relating to it!<br></br>
+                    <b>TIP: If you set a weapon to not managed, it won't show up by default.</b>
+                </Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Nevermind
+                </Button>
+                <Button variant="primary" onClick={() => {
+                    handleClose();
+                    RemoveUserWeapon(toBeDeleted.weapon_id);
+                }             
+                    }>
+                    Yes
+                </Button>
+                </Modal.Footer>
+            </Modal>
+            <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
                 <h1>Weapon Roster</h1>
             </Row>
-            <Row className="justify-content-md-center">
+            <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
                 <p>Click a cell to edit!</p>
             </Row>
             <Row className="justify-content-md-center">
@@ -292,7 +330,54 @@ function Weapons(){
                 >{
                     props => (
                         <div>
-                            <SearchBar { ...props.searchProps } className="searchBar"/>
+                            <Row className="justify-content-md-between" style={{paddingLeft: '30px', paddingRight: '30px'}}>
+                            <div style={{width: '300px', display: "inline-block"}} >
+                                <SearchBar { ...props.searchProps } className="searchBar"/>
+                            </div>
+                            <div>
+                                <div style={{width: '300px', display: "inline-block"}}>
+                                    <Select 
+                                        className="my-dropdown"
+                                        options={weapons.filter(IsWeaponNotAdded)} 
+                                        values={[]} 
+                                        valueField="weapon_id" 
+                                        labelField="name" 
+                                        searchBy="name" 
+                                        sortBy="name"
+                                        onChange={
+                                            (value) => {AddUserWeapon(value[0].weapon_id)}
+                                        }
+                                        closeOnSelect
+                                        placeholder="Select weapon to add..."
+                                        dropdownGap = {-2}
+                                        dropdownPosition= "auto"
+                                        clearOnSelect={true}
+                                    />
+                                </div>
+                                <div style={{width: '300px', paddingLeft: '10px', display: "inline-block"}}>
+                                    <Select
+                                        className="my-dropdown" 
+                                        options={userWeapons} 
+                                        values={[]} 
+                                        valueField="weapon_id" 
+                                        labelField="name" 
+                                        searchBy="name" 
+                                        sortBy="name" 
+                                        onChange={
+                                            (value) => {
+                                                setToBeDeleted(value[0]);
+                                                setShow(true);
+                                            }
+                                        }
+                                        closeOnSelect
+                                        placeholder="Select weapon to remove..."
+                                        dropdownGap = {-2}
+                                        dropdownPosition= "auto"
+                                        clearOnSelect={true}
+                                    />
+                                </div>
+                            </div>
+                            </Row>
                             <BootstrapTable
                                 bootstrap4 
                                 cellEdit={ cellEditFactory({ 
@@ -306,12 +391,17 @@ function Weapons(){
                                             weaponData.push(row.Users[0].UserWeapons)
                                         }
                                         setWeaponData(weaponData);
+                                        setChanged(true);
                                     }
                                 })}
                                 defaultSorted = {defaultSorted} 
-                                striped hover bordered condensed
-                                classes="my-table table-responsive"
+                                hover condensed
+                                classes="my-table"
+                                bordered= {false}
                                 filter={ filterFactory() }
+                                noDataIndication={() => (
+                                    <Spinner animation="border" variant="light" />
+                                )}
                                 { ...props.baseProps } />
                         </div>
                     )
@@ -319,52 +409,12 @@ function Weapons(){
                 }
                 </ToolkitProvider>
             </Row>
-            <Row className="justify-content-between">
-                <div className={'d-flex'}>
-                    <div>
-                        <Select 
-                            className="my-dropdown"
-                            options={weapons.filter(IsWeaponNotAdded)} 
-                            values={[]} 
-                            valueField="weapon_id" 
-                            labelField="name" 
-                            searchBy="name" 
-                            sortBy="name"
-                            onChange={
-                                (value) => AddUserWeapon(value)
-                            }
-                            closeOnSelect
-                            placeholder="Select weapon to add..."
-                            dropdownGap = {-2}
-                            style={{width: '300px !important', paddingRight: '10px'}}
-                        />
-                    </div>
-                    <div style={{paddingLeft: '10px'}}>
-                        <Select
-                            className="my-dropdown" 
-                            options={userWeapons} 
-                            values={[]} 
-                            valueField="weapon_id" 
-                            labelField="name" 
-                            searchBy="name" 
-                            sortBy="name" 
-                            onChange={
-                                (value) => RemoveUserWeapon(value)
-                            }
-                            closeOnSelect
-                            placeholder="Select weapon to remove..."
-                            style={{width: '300px !important', paddingLeft: '10px'}}
-                            dropdownGap = {-2}
-                        />
-                    </div>
-                </div>
-                <div>
-                    <Button variant="primary" onClick={() => saveChanged()} disabled={!(weaponData.length > 0)}>
-                            Save
-                    </Button>
-                </div>
-            </Row>
+            
         </Container>
+        <Button variant="primary" className="position-sticky float-right" style={{bottom: '10px', right: '10px', marginRight: '0px'}} onClick={() => saveChanged()} disabled={!(weaponData.length > 0)}>
+                        Save
+            </Button>
+        </>
     );
 };
 

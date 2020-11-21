@@ -27,6 +27,10 @@ db.Weapons = require("./Weapons.js")(sequelize, Sequelize);
 db.UserCharacters = require("./UserCharacters.js")(sequelize, Sequelize);
 db.UserItems = require("./UserItems.js")(sequelize, Sequelize);
 db.UserWeapons = require("./UserWeapons.js")(sequelize, Sequelize);
+db.Monsters = require("./Monsters.js")(sequelize, Sequelize);
+db.ItemMonsters = require("./ItemMonsters.js")(sequelize, Sequelize);
+db.Domains = require("./Domains.js")(sequelize, Sequelize);
+db.ItemDomains = require("./ItemDomains.js")(sequelize, Sequelize);
 
 db.Users.belongsToMany(db.Characters, {through: "UserCharacters", foreignKey: "user_id"});
 db.Characters.belongsToMany(db.Users, {through: "UserCharacters", foreignKey: "character_id"});
@@ -36,5 +40,11 @@ db.Items.belongsToMany(db.Users, {through: "UserItems", foreignKey: "item_id"});
 
 db.Users.belongsToMany(db.Weapons, {through: "UserWeapons", foreignKey: "user_id"});
 db.Weapons.belongsToMany(db.Users, {through: "UserWeapons", foreignKey: "weapon_id"});
+
+db.Items.belongsToMany(db.Monsters, {through: "ItemMonsters", foreignKey: "item_id"});
+db.Monsters.belongsToMany(db.Items, {through: "ItemMonsters", foreignKey: "monster_id"});
+
+db.Items.belongsToMany(db.Domains, {through: "ItemDomains", foreignKey: "item_id"});
+db.Domains.belongsToMany(db.Items, {through: "ItemDomains", foreignKey: "domain_id"});
 
 module.exports = db;

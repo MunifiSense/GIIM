@@ -7,7 +7,7 @@ module.exports = app => {
     router.get("/:id", userItems.getUserItems);
 
     // Add items wtih user id
-    router.post("/", userItems.addUserItems);
+    router.post("/:id", userItems.addUserItems);
 
     // Update character with user id
     router.put("/", userItems.updateUserItem);

@@ -42,10 +42,15 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 0
     },
-    managed: {
+    ascend_next_max: {
       type: DataTypes.INTEGER(1),
       allowNull: false,
       defaultValue: 0
+    },
+    managed: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false,
+      defaultValue: 1
     },
     normal_atk_level: {
       type: DataTypes.INTEGER(11),

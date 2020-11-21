@@ -32,7 +32,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 1
     },
-    desired_Level: {
+    desired_level: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       defaultValue: 1
@@ -42,10 +42,15 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 0
     },
-    managed: {
+    ascend_next_max: {
       type: DataTypes.INTEGER(1),
       allowNull: false,
       defaultValue: 0
+    },
+    managed: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false,
+      defaultValue: 1
     }
   }, {
     sequelize,

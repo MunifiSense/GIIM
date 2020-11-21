@@ -2,44 +2,44 @@
 
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('UserItems', {
-    user_item_id: {
+  return sequelize.define('ItemDomains', {
+    item_domain_id: {
       autoIncrement: true,
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true
     },
-    user_id: {
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-      references: {
-        model: 'Users',
-        key: 'user_id'
-      },
-      unique: "UserItems_ibfk_1"
-    },
     item_id: {
+        type: DataTypes.INTEGER(11),
+        allowNull: false,
+        references: {
+          model: 'Items',
+          key: 'item_id'
+        },
+        unique: "FK_ItemDomains_Items"
+    },
+    domain_id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       references: {
-        model: 'Items',
-        key: 'item_id'
+        model: 'Domains',
+        key: 'domain_id'
       },
-      unique: "item"
+      unique: "FK_ItemDomains_Domains"
     },
-    amount: {
+    day_of_week1: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
-      defaultValue: 0
+      defaultValue: 1
     },
-    forge: {
+    day_of_week2: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
-      defaultValue: 0
+      defaultValue: 1
     }
   }, {
     sequelize,
-    tableName: 'UserItems',
+    tableName: 'ItemDomains',
     timestamps: false
     });
 };
