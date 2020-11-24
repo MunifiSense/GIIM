@@ -29,6 +29,7 @@ require("./routes/Weapons.routes")(app);
 require("./routes/UserWeapons.routes")(app);
 require("./routes/Items.routes")(app);
 require("./routes/UserItems.routes")(app);
+require("./routes/Auth.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 9000;

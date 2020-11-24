@@ -14,6 +14,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import {FaSortUp, FaSortDown} from 'react-icons/fa';
 import filterFactory, { selectFilter } from 'react-bootstrap-table2-filter';
 import Select from "react-dropdown-select";
+import { BsFillPeopleFill } from 'react-icons/bs';
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Card from "react-bootstrap/esm/Card";
@@ -517,6 +518,15 @@ function Characters(){
 
     return(
         <>
+        <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
+            <div style={{display: 'flex', alignItems: 'center'}}>
+                <BsFillPeopleFill size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
+                <h1 style={{display: "inline-block"}}>Team Roster</h1>
+            </div>             
+        </Row>
+        <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
+            <p>Click a cell to edit!</p>
+        </Row>
         <Container fluid className='table-container'>
             <Modal
                 show={show}
@@ -551,12 +561,6 @@ function Characters(){
                 </Modal.Footer>
             </Modal>
             
-            <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
-                <h1>Team Roster</h1>
-            </Row>
-            <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
-                <p>Click a cell to edit!</p>
-            </Row>
             <Row className="justify-content-md-center">
                 <ToolkitProvider
                     keyField="character_id"
@@ -649,7 +653,7 @@ function Characters(){
             
             
         </Container>
-        <Button variant="primary" className="position-sticky float-right" style={{bottom: '10px', right: '10px', marginRight: '0px'}} onClick={() => saveChanged()} disabled={!changed}>
+        <Button variant="primary" className="position-sticky float-right save-button" onClick={() => saveChanged()} disabled={!changed}>
                         Save
             </Button>
         </>

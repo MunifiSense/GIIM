@@ -9,8 +9,17 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    user_name: {
-      type: DataTypes.STRING(45),
+    email: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      unique: true
+    },
+    id: {
+      type: DataTypes.STRING(100),
+      allowNull: false
+    },
+    token: {
+      type: DataTypes.STRING(2048),
       allowNull: false
     }
   }, {

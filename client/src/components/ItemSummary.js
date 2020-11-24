@@ -15,6 +15,7 @@ import {GiTwoHandedSword, GiPiercingSword, GiSpearHook, GiPocketBow, GiSecretBoo
 import Image from 'react-bootstrap/Image';
 import Spinner from 'react-bootstrap/Spinner';
 import { useAccordionToggle } from 'react-bootstrap/AccordionToggle';
+import {FaGem} from 'react-icons/fa';
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -436,7 +437,10 @@ function Items(){
             <>
         <Container fluid>
             <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
-                <h1>Item Summary</h1>
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                    <FaGem size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
+                    <h1 style={{display: "inline-block"}}>Needed Item Summary</h1>
+                </div>   
             </Row>
             <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
                 <p>What you entered all that information for!</p>
@@ -454,11 +458,37 @@ function Items(){
         <>
         <Container fluid>
             <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
-                <h1>Item Summary</h1>
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                    <FaGem size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
+                    <h1 style={{display: "inline-block"}}>Needed Item Summary</h1>
+                </div>   
             </Row>
             <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
                 <p>What you entered all that information for!</p>
             </Row>
+            <Accordion defaultActiveKey="0" style={{marginBottom: '10px'}}>
+                <Card className="acc-card text-center">
+                    <Card.Header>
+                        <ToggleIcon as={Card.Header} eventKey="0" onClick={{}}>
+                        <b>All Items</b>
+                        </ToggleIcon>
+                    </Card.Header>
+                    <Accordion.Collapse eventKey="0">
+                    <Card.Body>
+                        <Row className="justify-content-md-center">
+                            {Object.keys(userItems).map((item, i) => {
+                                var itemName = Object.keys(userItems)[i];
+                                return (
+                                    <Fragment key={itemName}>
+                                        {imageWithToolTipIfAmount('Item', itemName, item.needed)}
+                                    </Fragment>
+                                )
+                            })}
+                        </Row>
+                    </Card.Body>
+                    </Accordion.Collapse>
+                </Card>
+            </Accordion>
             <Accordion defaultActiveKey="0" style={{marginBottom: '10px'}}>
                 <Card className="acc-card text-center">
                     <Card.Header>

@@ -12,6 +12,7 @@ import cellEditFactory from 'react-bootstrap-table2-editor';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import {FaSortUp, FaSortDown} from 'react-icons/fa';
 import filterFactory, { numberFilter, Comparator } from 'react-bootstrap-table2-filter';
+import { GiSwapBag } from 'react-icons/gi';
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 const { SearchBar } = Search;
@@ -289,13 +290,16 @@ function Items(){
 
     return(
         <>
-        <Container fluid className='table-container'>
-            <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
-                <h1>Item Inventory</h1>
-            </Row>
-            <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
-                <p>Click a cell to edit!</p>
-            </Row>
+        <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
+            <div style={{display: 'flex', alignItems: 'center'}}>
+                <GiSwapBag size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
+                <h1 style={{display: "inline-block"}}>Item Inventory</h1>
+            </div>    
+        </Row>
+        <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
+            <p>Click a cell to edit!</p>
+        </Row>
+        <Container fluid className='table-container'>         
             <Row className="justify-content-md-center">
                 <ToolkitProvider
                     keyField="item_id"
@@ -342,9 +346,9 @@ function Items(){
                 </ToolkitProvider>
             </Row>
         </Container>
-        <Button variant="primary" className="position-sticky float-right" style={{bottom: '10px', right: '10px', marginRight: '0px'}} onClick={() => saveChanged()} disabled={!changed}>
+        <Button variant="primary" className="position-sticky float-right save-button" onClick={() => saveChanged()} disabled={!changed}>
                         Save
-                </Button>
+        </Button>
         </>
     );
 };

@@ -14,6 +14,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import {FaSortUp, FaSortDown} from 'react-icons/fa';
 import filterFactory, { selectFilter } from 'react-bootstrap-table2-filter';
 import Select from "react-dropdown-select";
+import { RiSwordFill } from 'react-icons/ri';
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 const { SearchBar } = Search;
@@ -282,6 +283,15 @@ function Weapons(){
 
     return(
         <>
+        <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
+            <div style={{display: 'flex', alignItems: 'center'}}>
+                <RiSwordFill size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
+                <h1 style={{display: "inline-block"}}>Weapon Roster</h1>
+            </div>   
+        </Row>
+        <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
+                <p>Click a cell to edit!</p>
+        </Row>
         <Container fluid className='table-container'>
             <Modal
                 show={show}
@@ -315,12 +325,7 @@ function Weapons(){
                 </Button>
                 </Modal.Footer>
             </Modal>
-            <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
-                <h1>Weapon Roster</h1>
-            </Row>
-            <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
-                <p>Click a cell to edit!</p>
-            </Row>
+            
             <Row className="justify-content-md-center">
                 <ToolkitProvider
                     keyField="weapon_id"
@@ -411,7 +416,7 @@ function Weapons(){
             </Row>
             
         </Container>
-        <Button variant="primary" className="position-sticky float-right" style={{bottom: '10px', right: '10px', marginRight: '0px'}} onClick={() => saveChanged()} disabled={!(weaponData.length > 0)}>
+        <Button variant="primary" className="position-sticky float-right save-button" onClick={() => saveChanged()} disabled={!(weaponData.length > 0)}>
                         Save
             </Button>
         </>

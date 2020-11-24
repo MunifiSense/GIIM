@@ -2,7 +2,7 @@ import React from "react";
 import { ProSidebar, Menu, MenuItem, SidebarContent} from 'react-pro-sidebar';
 import { IconContext } from 'react-icons';
 import { FaBars, FaGem, FaHeart, FaHome } from 'react-icons/fa';
-import { GiTargetArrows } from 'react-icons/gi';
+import { GiSwapBag } from 'react-icons/gi';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { RiSwordFill } from 'react-icons/ri';
@@ -11,9 +11,12 @@ import Navbar from 'react-bootstrap/Navbar';
 import { Switch, Route, Link } from "react-router-dom";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { GoogleLogin, GoogleLogout } from 'react-google-login';
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'react-pro-sidebar/dist/css/styles.css';
 import "./App.css";
+import {refreshTokenSetup} from './tools/refreshToken';
+import {authenticate} from './services/AuthService';
 
 import Home from "./components/Main";
 import Characters from "./components/Characters";
@@ -29,6 +32,38 @@ function App (){
   const [collapsed, setCollapsed] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
 
+  const [isAuthenticated, setAuthenticated] = React.useState(false);
+  const [user, setUser] = React.useState(null);
+  const [token, setToken] = React.useState('');
+
+  const loginSuccess = (response) => {
+    console.log(response);
+    refreshTokenSetup(response);
+    // Verify token and create user if doesn't exist
+    
+    authenticate(response.tokenId)
+    .then(res => {
+        console.log(res.data);
+        console.log("User successfully authenticated!");
+        setAuthenticated(true);
+        setUser(res.googleId);
+        setToken(res.tokenId);
+    })
+    .catch(e => {
+        console.log(e);
+    });
+  }
+
+  const loginFail = (response) => {
+    console.log(response);
+  }
+
+  const logout = (response) => {
+    setAuthenticated(false);
+    setUser(null);
+    setToken('');
+  }
+
   return(
     <div className="page-content">
         <IconContext.Provider value={{className : 'react-icons'}}>
@@ -42,6 +77,7 @@ function App (){
                   ? <IoIosArrowForward/ >
                   : <IoIosArrowBack />}
                 </Button>
+                
               <div className="top-brand">
                 <Navbar.Brand href="/">
                   <div style={{display: 'inline-block'}}>
@@ -50,6 +86,28 @@ function App (){
                     GIM
                 </Navbar.Brand>
               </div>
+              <div style={{position: 'fixed', right: '10px'}}>
+                {!isAuthenticated? 
+                  <GoogleLogin
+                      clientId="871403107294-7if7ber7cm2po4t5nnrvvdogpsp09t0l.apps.googleusercontent.com"
+                      buttonText="Login with Google"
+                      onSuccess={loginSuccess}
+                      onFailure={loginFail}
+                      cookiePolicy={'single_host_origin'}
+                      isSignedIn={true}
+                      theme={'dark'}
+                  /> : 
+                  <GoogleLogout
+                    clientId="871403107294-7if7ber7cm2po4t5nnrvvdogpsp09t0l.apps.googleusercontent.com"
+                    buttonText="Logout"
+                    onLogoutSuccess={logout}
+                    theme={'dark'}
+                  />
+                }
+                              
+              </div>
+
+              
             </Navbar>
           <Collapse className={menuOpen ? "sidebar-open" : "sidebar-collapse"} dimension="width" in={menuOpen}>
               <div className="sidebar">
@@ -68,11 +126,11 @@ function App (){
                         <b>Weapon Roster</b>
                         <Link to ="/weapons"/>
                       </MenuItem>
-                      <MenuItem icon={<FaGem size='35'/>}>
+                      <MenuItem icon={<GiSwapBag size='35'/>}>
                         <b>Item Inventory</b>
                         <Link to ="/items"/>
                       </MenuItem>
-                      <MenuItem icon={<GiTargetArrows size='35'/>}>
+                      <MenuItem icon={<FaGem size='35'/>}>
                         <b>Item Summary</b>
                         <Link to ="/itemsummary"/>
                       </MenuItem>
