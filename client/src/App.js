@@ -17,6 +17,8 @@ import 'react-pro-sidebar/dist/css/styles.css';
 import "./App.css";
 import {refreshTokenSetup} from './tools/refreshToken';
 import {authenticate} from './services/AuthService';
+import { useDispatch, useSelector } from "react-redux";
+import {login} from "./redux/actions/auth";
 
 import Home from "./components/Main";
 import Characters from "./components/Characters";
@@ -32,26 +34,19 @@ function App (){
   const [collapsed, setCollapsed] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
 
-  const [isAuthenticated, setAuthenticated] = React.useState(false);
   const [user, setUser] = React.useState(null);
   const [token, setToken] = React.useState('');
+
+  const {isLoggedIn} = useSelector(state => state.auth);
+
+  const dispatch = useDispatch();
 
   const loginSuccess = (response) => {
     console.log(response);
     refreshTokenSetup(response);
     // Verify token and create user if doesn't exist
     
-    authenticate(response.tokenId)
-    .then(res => {
-        console.log(res.data);
-        console.log("User successfully authenticated!");
-        setAuthenticated(true);
-        setUser(res.googleId);
-        setToken(res.tokenId);
-    })
-    .catch(e => {
-        console.log(e);
-    });
+    dispatch(login(response));
   }
 
   const loginFail = (response) => {
@@ -59,9 +54,7 @@ function App (){
   }
 
   const logout = (response) => {
-    setAuthenticated(false);
-    setUser(null);
-    setToken('');
+    dispatch(logout);
   }
 
   return(
@@ -87,14 +80,13 @@ function App (){
                 </Navbar.Brand>
               </div>
               <div style={{position: 'fixed', right: '10px'}}>
-                {!isAuthenticated? 
+                {!isLoggedIn? 
                   <GoogleLogin
                       clientId="871403107294-7if7ber7cm2po4t5nnrvvdogpsp09t0l.apps.googleusercontent.com"
                       buttonText="Login with Google"
                       onSuccess={loginSuccess}
                       onFailure={loginFail}
                       cookiePolicy={'single_host_origin'}
-                      isSignedIn={true}
                       theme={'dark'}
                   /> : 
                   <GoogleLogout

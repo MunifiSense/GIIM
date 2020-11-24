@@ -15,10 +15,7 @@ exports.addUser = async (req, res) =>{
         Users.update(user, {
             where: {email: user.email}
         }).then(data => {
-            res.status(200).send({
-                message:
-                    "User succesfully authenticated and updated in database!"
-            });
+            res.send(user);
         })
         .catch(err => {
             console.log(err);
@@ -27,10 +24,7 @@ exports.addUser = async (req, res) =>{
         // Save new user
         Users.create(user)
         .then(data => {
-            res.status(201).send({
-                message:
-                    "User succesfully authenticated and added to database!"
-            });
+            res.send(user);
         })
         .catch(err => {
             console.log(err);
