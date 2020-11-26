@@ -11,6 +11,6 @@ export function authenticate(token){
     });
 };
 
-export function logout(){
+export function authlogout(){
     localStorage.removeItem("user");
 }

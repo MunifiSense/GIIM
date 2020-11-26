@@ -22,7 +22,6 @@ function Items(){
     const [userItems, setUserItems] = useState([]);
     const [itemData, setItemData] = useState([]);
     const [changed, setChanged] = useState(false);
-    const id = 1;
     const columns = [{
         dataField: `item_id`,
         hidden: true
@@ -193,7 +192,7 @@ function Items(){
 
     async function retrieveUserItems(){
         return new Promise(function(resolve, reject) {
-            getUserItems(id).then(response => {
+            getUserItems().then(response => {
                 if(response.data.length < items.length){
                     AddUserItems();
                 }
@@ -243,7 +242,7 @@ function Items(){
     }
 
     function AddUserItems(){
-        addUserItems(id)
+        addUserItems()
         .then(response => {
             console.log(response.data);
             console.log("The user item was added successfully!");
@@ -257,7 +256,6 @@ function Items(){
     function UpdateUserItem(value){
         console.log(value);
         const data ={
-            userid: id,
             itemid: value.item_id,
             amount: value.amount,
             forge: value.forge

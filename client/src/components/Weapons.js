@@ -28,7 +28,6 @@ function Weapons(){
     const [toBeDeleted, setToBeDeleted] = useState({});
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const id = 1;
     const selectOptions = {
         0: '-',
         1: '✓'
@@ -64,6 +63,22 @@ function Weapons(){
     },{
         dataField: `Users[0].UserWeapons.ascended`,
         text: `Ascended`,
+        editor: {
+            type: Type.CHECKBOX,
+            value: '1:0'
+        },
+        formatter: boolFormatter,
+        formatExtraData: {
+            0: '-',
+            1: '✓'
+        },
+        sort: true,
+        sortCaret: sortingThing,
+        style: {backgroundColor: '#303030'},
+        headerStyle: {backgroundColor: '#303030'}
+    },{
+        dataField: `Users[0].UserWeapons.ascend_next_max`,
+        text: `Ascend On Max?`,
         editor: {
             type: Type.CHECKBOX,
             value: '1:0'
@@ -199,7 +214,7 @@ function Weapons(){
     };
 
     function retrieveUserWeapons(){
-        getUserWeapons(id).then(response => {
+        getUserWeapons().then(response => {
             setUserWeapons(response.data);
             console.log(response.data);
         }).catch(e => {
@@ -209,7 +224,6 @@ function Weapons(){
 
     function AddUserWeapon(cid){
         const data ={
-            userid: id,
             weaponid: cid
         };
         addUserWeapon(data)
@@ -225,7 +239,6 @@ function Weapons(){
 
     function UpdateUserWeapon(value){
         const data ={
-            userid: id,
             weaponid: value.weapon_id,
             level: value.level,
             desired_level: value.desired_level,
@@ -243,7 +256,7 @@ function Weapons(){
     }; 
 
     function RemoveUserWeapon(cid){
-        removeUserWeapon(id, cid)
+        removeUserWeapon(cid)
         .then(response => {
             console.log(response.data);
             retrieveWeaponsInfo();

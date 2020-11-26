@@ -10,13 +10,13 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     user_id: {
-      type: DataTypes.INTEGER(11),
+      type: DataTypes.STRING(50),
       allowNull: false,
       references: {
         model: 'Users',
         key: 'user_id'
       },
-      unique: "UserWeapons_ibfk_1"
+      unique: "FK_UserWeapons_Users"
     },
     weapon_id: {
       type: DataTypes.INTEGER(11),

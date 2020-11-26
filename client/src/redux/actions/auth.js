@@ -1,15 +1,17 @@
-import {authenticate} from '../../services/AuthService';
+import {authenticate, authlogout} from '../../services/AuthService';
 
 import {
     LOGIN_SUCCESS,
     LOGIN_FAIL,
-    LOGOUT,
-    SET_LOGIN_INFO
-} from "./types"
+    LOGOUT
+} from "./types";
 
 export const login = (response) => (dispatch) => {
     authenticate(response.tokenId)
     .then((res) => {
+        // Check if first login
+        // If first login, check if local data exists
+        // Add local data to DB if data exists
         dispatch({
             type: LOGIN_SUCCESS,
             payload: res
@@ -27,8 +29,8 @@ export const login = (response) => (dispatch) => {
 };
 
 export const logout = () => (dispatch) => {
-
+    authlogout();
     dispatch({
-        type: LOGOUT,
+        type: LOGOUT
     });
 };

@@ -1,7 +1,7 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Card from 'react-bootstrap/Card';
-import Col from 'react-bootstrap/esm/Col';
+import Col from 'react-bootstrap/Col';
 import ListGroup from 'react-bootstrap/ListGroup'
 
 function Home(){
@@ -24,6 +24,8 @@ function Home(){
                   This is a site for managing your Genshin Impact items! You can set your characters or weapons and find out exactly how many of each item you need to collect.<br></br>
                   <br></br>  
                   Click the menu bar on the top left to access the important stuff.
+                  <br></br>
+                  Login on the top right if you want your data to persist between devices. Otherwise, it will save locally to you browser and data could be lost at some point.
                   </Card.Text>
                 </Card.Body>
               </Card>

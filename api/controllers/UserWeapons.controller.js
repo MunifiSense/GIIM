@@ -5,7 +5,7 @@ const UserWeapons = db.UserWeapons;
 const Op = db.Sequelize.Op;
 
 exports.getUserWeapons = (req, res) => {
-    const id = req.params.id;
+    const id = req.id;
     Weapons.findAll({
         include: [{
             model: Users,
@@ -29,7 +29,7 @@ exports.getUserWeapons = (req, res) => {
 
 exports.addUserWeapon = (req, res) => {
     // Validate request
-    if (!req.body.userid) {
+    if (!req.id) {
         res.status(400).send({
             message: "Content can not be empty!"
         });
@@ -38,7 +38,7 @@ exports.addUserWeapon = (req, res) => {
 
     // Create UserWeapon
     const userWeapon = {
-        user_id: req.body.userid,
+        user_id: req.id,
         weapon_id: req.body.weaponid
     };
 
@@ -59,13 +59,13 @@ exports.addUserWeapon = (req, res) => {
 
 exports.updateUserWeapon = (req, res) => {
     // Validate request
-    if (!req.body.userid) {
+    if (!req.id) {
         res.status(400).send({
             message: "Content can not be empty!"
         });
         return;
     }
-    const userid = req.body.userid;
+    const userid = req.id;
     const weaponid = req.body.weaponid;
     const userWeapon = {
         level: req.body.level,
@@ -95,8 +95,8 @@ exports.updateUserWeapon = (req, res) => {
 };
 
 exports.removeUserWeapon = (req, res) => {
-    const userid = req.params.id;
-    const weaponid = req.query.weaponid
+    const userid = req.id;
+    const weaponid = req.params.weaponid
 
     UserWeapons.destroy({where: {
         user_id: userid,

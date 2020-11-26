@@ -16,7 +16,7 @@ module.exports = function(sequelize, DataTypes) {
         model: 'Users',
         key: 'user_id'
       },
-      unique: "UserCharacters_ibfk_2"
+      unique: "FK_UserCharacters_Users"
     },
     character_id: {
       type: DataTypes.INTEGER(11),

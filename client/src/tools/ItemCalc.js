@@ -1,7 +1,6 @@
 import {getUserCharacters} from "../services/CharacterService";
 import {getUserWeapons} from "../services/WeaponService";
 import {getUserItems} from "../services/ItemService";
-const id = 1;
 const xpToNextLevel = [
     0,
     1000,
@@ -353,10 +352,10 @@ const xpToLevelWeaponRarity5 = [
     593675
 ];
 
-export async function getNeededItemsCharacters(id){
+export async function getNeededItemsCharacters(){
     return new Promise(function(resolve, reject) {
-        getUserCharacters(id).then(userCharResponse => {
-            getUserItems(id).then(userItemResponse => {
+        getUserCharacters().then(userCharResponse => {
+            getUserItems().then(userItemResponse => {
                 var neededItems= [];
                 userCharResponse.data.forEach(character => {
                     var level = character.Users[0].UserCharacters.level;
@@ -759,11 +758,11 @@ export async function getNeededItemsCharacters(id){
     
 }
 
-export async function getNeededItemsWeapons(id){
+export async function getNeededItemsWeapons(){
     return new Promise(function(resolve, reject) {
-        getUserWeapons(id).then(userWeaponResponse => {
+        getUserWeapons().then(userWeaponResponse => {
             var neededItems = [];
-            getUserItems(id).then(userItemResponse => {
+            getUserItems().then(userItemResponse => {
                 userWeaponResponse.data.forEach(weapon => {
                     var level = weapon.Users[0].UserWeapons.level;
                     var desired_level = weapon.Users[0].UserWeapons.desired_level;
@@ -1048,7 +1047,7 @@ async function setupNeededItems(userItems){
 }
 
 export async function retrieveNeededWeaponItems(userItems){
-    var neededItems = await getNeededItemsWeapons(id);
+    var neededItems = await getNeededItemsWeapons();
     if(neededItems){
         neededItems.forEach(weapon => {
             var item = findItemIndex(userItems, weapon.domain.item_rarity2);
@@ -1104,7 +1103,7 @@ export async function retrieveNeededWeaponItems(userItems){
 };
 
 export async function retrieveNeededCharacterItems(userItems){
-    var neededItems = await getNeededItemsCharacters(id);
+    var neededItems = await getNeededItemsCharacters();
     if(neededItems){
         for(var character of neededItems){
             var item = findItemIndex(userItems, character.crystal.item_rarity2);

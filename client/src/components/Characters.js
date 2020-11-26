@@ -15,21 +15,26 @@ import {FaSortUp, FaSortDown} from 'react-icons/fa';
 import filterFactory, { selectFilter } from 'react-bootstrap-table2-filter';
 import Select from "react-dropdown-select";
 import { BsFillPeopleFill } from 'react-icons/bs';
+import { useDispatch, useSelector } from "react-redux";
+import {addUserCharDataNotSignedIn, updateUserCharDataNotSignedIn, removeUserCharDataNotSignedIn, getCharacterData, getUserCharDataNotSignedIn} from "../redux/actions/data";
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Card from "react-bootstrap/esm/Card";
 const { SearchBar } = Search;
 
 function Characters(){
-    const [characters, setCharacters] = useState([]);
-    const [userCharacters, setUserCharacters] = useState([]);
+    const {isLoggedIn} = useSelector(state => state.auth);
+    const {characters} = useSelector(state => state.characters);
+    const {userCharacters} = useSelector(state => state.userCharacters);
     const [characterData, setCharacterData] = useState([]);
     const [changed, setChanged] = useState(false);
     const [show, setShow] = useState(false);
     const [toBeDeleted, setToBeDeleted] = useState({});
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const id = 1;
+
+    const dispatch = useDispatch();
+
     const selectOptions = {
         0: '-',
         1: '✓'
@@ -417,77 +422,84 @@ function Characters(){
     }, []);
 
     function retrieveCharactersInfo(){
-        getAllCharacters().then(response => {
-            setCharacters(response.data);
-            console.log(response.data);
-        }).catch(e => {
-            console.log(e);
-        });
+        dispatch(getCharacterData);
     };
 
     function retrieveUserCharacters(){
-        getUserCharacters(id).then(response => {
-            setUserCharacters(response.data);
-            console.log(response.data);
-        }).catch(e => {
-            console.log(e);
-        });
+        if(isLoggedIn){
+
+        }else{
+            dispatch(getUserCharDataNotSignedIn);
+        }
     };
 
     function AddUserCharacter(cid){
-        const data ={
-            userid: id,
-            charid: cid
-        };
-        addUserCharacter(data)
-        .then(response => {
-            console.log(response.data);
-            console.log("The user character was added successfully!");
-            retrieveUserCharacters();
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        if(isLoggedIn){
+            const data ={
+                charid: cid
+            };
+            addUserCharacter(data)
+            .then(response => {
+                console.log(response.data);
+                console.log("The user character was added successfully!");
+                retrieveUserCharacters();
+            })
+            .catch(e => {
+                console.log(e);
+            });
+        }else{
+            dispatch(addUserCharDataNotSignedIn(cid));
+        }
+        
     };
 
     function UpdateUserCharacter(value){
-        console.log(value);
-        const data ={
-            userid: id,
-            charid: value.character_id,
-            level: value.level,
-            desired_level: value.desired_level,
-            ascended: value.ascended,
-            ascend_next_max: value.ascend_next_max,
-            normal_atk_level: value.normal_atk_level,
-            normal_atk_desired_level: value.normal_atk_desired_level,
-            q_atk_level: value.q_atk_level,
-            q_atk_desired_level: value.q_atk_desired_level,
-            e_atk_level: value.e_atk_level,
-            e_atk_desired_level: value.e_atk_desired_level,
-            managed: value.managed
-        };
-        updateUserCharacter(data)
-        .then(response => {
-            console.log(response.data);
-            console.log("The user character was updated successfully!");
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        if(isLoggedIn){
+            console.log(value);
+            const data ={
+                charid: value.character_id,
+                level: value.level,
+                desired_level: value.desired_level,
+                ascended: value.ascended,
+                ascend_next_max: value.ascend_next_max,
+                normal_atk_level: value.normal_atk_level,
+                normal_atk_desired_level: value.normal_atk_desired_level,
+                q_atk_level: value.q_atk_level,
+                q_atk_desired_level: value.q_atk_desired_level,
+                e_atk_level: value.e_atk_level,
+                e_atk_desired_level: value.e_atk_desired_level,
+                managed: value.managed
+            };
+            updateUserCharacter(data)
+            .then(response => {
+                console.log(response.data);
+                console.log("The user character was updated successfully!");
+            })
+            .catch(e => {
+                console.log(e);
+            });
+        }else{
+            dispatch(updateUserCharDataNotSignedIn(value));
+        }
+        
     }; 
 
     function RemoveUserCharacter(cid){
-        removeUserCharacter(id, cid)
-        .then(response => {
-            console.log(response.data);
-            retrieveCharactersInfo();
-            retrieveUserCharacters();
-            console.log("The user character was removed successfully!");
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        if(isLoggedIn){
+            removeUserCharacter(cid)
+            .then(response => {
+                console.log(response.data);
+                retrieveCharactersInfo();
+                retrieveUserCharacters();
+                console.log("The user character was removed successfully!");
+            })
+            .catch(e => {
+                console.log(e);
+            });
+        }else{
+            dispatch(removeUserCharDataNotSignedIn(cid));
+        }
+        
     };
 
     function IsCharNotAdded(value){

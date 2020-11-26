@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ProSidebar, Menu, MenuItem, SidebarContent} from 'react-pro-sidebar';
 import { IconContext } from 'react-icons';
 import { FaBars, FaGem, FaHeart, FaHome } from 'react-icons/fa';
@@ -11,6 +11,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import { Switch, Route, Link } from "react-router-dom";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Alert from 'react-bootstrap/Alert';
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'react-pro-sidebar/dist/css/styles.css';
@@ -18,7 +19,8 @@ import "./App.css";
 import {refreshTokenSetup} from './tools/refreshToken';
 import {authenticate} from './services/AuthService';
 import { useDispatch, useSelector } from "react-redux";
-import {login} from "./redux/actions/auth";
+import {login, logout} from "./redux/actions/auth";
+import { Offline } from "react-detect-offline";
 
 import Home from "./components/Main";
 import Characters from "./components/Characters";
@@ -31,21 +33,16 @@ import Collapse from "react-bootstrap/esm/Collapse";
 import Container from "react-bootstrap/esm/Container";
 
 function App (){
-  const [collapsed, setCollapsed] = React.useState(false);
-  const [menuOpen, setMenuOpen] = React.useState(false);
-
-  const [user, setUser] = React.useState(null);
-  const [token, setToken] = React.useState('');
-
+  const [collapsed, setCollapsed] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [show, setShow] = useState(true);
   const {isLoggedIn} = useSelector(state => state.auth);
 
   const dispatch = useDispatch();
 
   const loginSuccess = (response) => {
-    console.log(response);
     refreshTokenSetup(response);
-    // Verify token and create user if doesn't exist
-    
+
     dispatch(login(response));
   }
 
@@ -53,8 +50,8 @@ function App (){
     console.log(response);
   }
 
-  const logout = (response) => {
-    dispatch(logout);
+  const logoutSuccess = () => {
+    dispatch(logout());
   }
 
   return(
@@ -92,7 +89,7 @@ function App (){
                   <GoogleLogout
                     clientId="871403107294-7if7ber7cm2po4t5nnrvvdogpsp09t0l.apps.googleusercontent.com"
                     buttonText="Logout"
-                    onLogoutSuccess={logout}
+                    onLogoutSuccess={logoutSuccess}
                     theme={'dark'}
                   />
                 }
@@ -152,6 +149,14 @@ function App (){
           (collapsed? "footer shift-collapsed" : "footer shift" )
           : "footer no-shift"}>
             <Container fluid>
+              <Offline>
+                <Alert variant="danger" onClose={() => setShow(false)} dismissible>
+                <Alert.Heading>Hey! Looks like you're offline!</Alert.Heading>
+                  <p>
+                    Check your internet connection or else nothing will save anymore!
+                  </p>
+                </Alert>
+              </Offline>
               <Row>
                 <Col md={{ span: 3, offset: 1 }} style={{marginTop: '20px'}}>
                     <div style={{display: 'inline-block'}}>

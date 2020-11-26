@@ -1,8 +1,7 @@
 import {
     LOGIN_SUCCESS,
     LOGIN_FAIL,
-    LOGOUT,
-    SET_LOGIN_INFO
+    LOGOUT
 } from "../actions/types"
 
 const user = JSON.parse(localStorage.getItem("user"));
@@ -16,7 +15,6 @@ export default function (state = initialState, action){
 
     switch(type){
         case LOGIN_SUCCESS:
-            console.log(payload);
             return{
                 ...state,
                 isLoggedIn: true,
