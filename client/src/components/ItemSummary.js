@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, Fragment } from "react";
-import {getAllItems, getUserItems} from "../services/ItemService";
+import {/*getAllItems, */getUserItems} from "../services/ItemService";
 import {retrieveNeeded, getNeededItemsCharacters, getNeededItemsWeapons} from "../tools/ItemCalc";
 import Container from 'react-bootstrap/Container';
 import Accordion from 'react-bootstrap/Accordion';
@@ -16,11 +16,13 @@ import Image from 'react-bootstrap/Image';
 import Spinner from 'react-bootstrap/Spinner';
 import { useAccordionToggle } from 'react-bootstrap/AccordionToggle';
 import {FaGem} from 'react-icons/fa';
+import { userContext } from "../userContext";
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function Items(){
-    const [items, setItems] = useState([]);
+    const user = useContext(userContext);
+    //const [items, setItems] = useState([]);
     const [userItems, setUserItems] = useState([]);
     const [weaponItems, setWeaponItems] = useState([]);
     const [characterItems, setCharacterItems] = useState([]);
@@ -30,23 +32,31 @@ function Items(){
     const [bossItems, setBossItems] = useState();
     const [harvestingItems, setHarvestingItems] = useState([]);
     const [miscItems, setMiscItems] = useState();
-    const id = 1;
 
     useEffect(() =>{
-        retrieveStuff();
+        (async function retrieveStuff() {
+            //setItems(await retrieveItemsInfo());
+            setCharacterItems(await getNeededItemsCharacters(user));
+            setWeaponItems(await getNeededItemsWeapons(user));
+            var something = await retrieveNeeded(user, await retrieveUserItems());
+            setUserItems(something);
+            await itemSummary(something);
+            setLoading(false);
+        }) ();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    async function retrieveStuff(){
-        setItems(await retrieveItemsInfo());
-        setCharacterItems(await getNeededItemsCharacters(id));
-        setWeaponItems(await getNeededItemsWeapons(id));
-        var something = await retrieveNeeded(await retrieveUserItems());
+    /*async function retrieveStuff(){
+        //setItems(await retrieveItemsInfo());
+        setCharacterItems(await getNeededItemsCharacters(user));
+        setWeaponItems(await getNeededItemsWeapons(user));
+        var something = await retrieveNeeded(user, await retrieveUserItems());
         setUserItems(something);
         await itemSummary(something);
         setLoading(false);
-    }
+    }*/
 
-    async function retrieveItemsInfo(){
+    /*async function retrieveItemsInfo(){
         return new Promise(function(resolve, reject) {
             getAllItems().then(response => {
                 resolve(response.data);
@@ -54,15 +64,28 @@ function Items(){
                 console.log(e);
             });
         })
-    };
+    };*/
 
     async function retrieveUserItems(){
-        return new Promise(function(resolve, reject) {
-            getUserItems(id).then(response => {
-                resolve(response.data);
-            }).catch(e => {
-                console.log(e);
-            });
+        return new Promise(function(resolve, reject) {         
+            if(user){
+                getUserItems().then(response => {
+                    resolve(response.data);
+                }).catch(e => {
+                    console.log(e);
+                });
+            }else{
+                // If not signed in and no userItems stored locally...
+                var localUserItemData = JSON.parse(localStorage.getItem("userItems"));
+                if(!localUserItemData || localUserItemData.length === 0){
+                    const newUserItems = [];
+                    setUserItems(newUserItems);     
+                    localStorage.setItem("userItems", JSON.stringify(newUserItems));
+                    resolve(newUserItems);
+                }else{
+                    resolve(localUserItemData);
+                }
+            }
         })
     };
 
@@ -94,7 +117,6 @@ function Items(){
         } else{
             return('https://muni.moe/images/genshin/'+ type +'_'+itemName.replace(/ /g, '_').replace(/'/g,'%27')+'.png');
         }
-        return <></>;
     }
 
     async function itemSummary(itemsList){
@@ -155,6 +177,7 @@ function Items(){
                     })
                 }else if(element.Domains.length > 0){
                     // Domains
+                    console.log(element.Domains);
                     element.Domains.forEach(domain => {
                         if(!domainStuff[domain.name]){
                             domainStuff[domain.name] = {};                       
@@ -373,7 +396,7 @@ function Items(){
                 </Tooltip>
             }
             >
-                <GiPocketBow roundedCircle size='25' className='overlay-top' style={{borderRadius: '50%', padding: '3px'}}/>
+                <GiPocketBow size='25' className='overlay-top' style={{borderRadius: '50%', padding: '3px'}}/>
                 </OverlayTrigger>
                 
             )
@@ -387,7 +410,7 @@ function Items(){
                 </Tooltip>
             }
             >
-                <GiTwoHandedSword roundedCircle size='25' className='overlay-top' style={{borderRadius: '50%', padding: '3px'}}/>
+                <GiTwoHandedSword size='25' className='overlay-top' style={{borderRadius: '50%', padding: '3px'}}/>
                 </OverlayTrigger>   
             )
         } else if(weaponType === "Polearm"){
@@ -400,7 +423,7 @@ function Items(){
                 </Tooltip>
             }
             >
-                <GiSpearHook roundedCircle size='25' className='overlay-top' style={{borderRadius: '50%', padding: '3px'}}/>
+                <GiSpearHook size='25' className='overlay-top' style={{borderRadius: '50%', padding: '3px'}}/>
                 </OverlayTrigger>   
             )
         } else if(weaponType === "Catalyst"){
@@ -413,7 +436,7 @@ function Items(){
                 </Tooltip>
             }
             >
-                <GiSecretBook roundedCircle size='25' className='overlay-top' style={{borderRadius: '50%', padding: '3px'}}/>
+                <GiSecretBook size='25' className='overlay-top' style={{borderRadius: '50%', padding: '3px'}}/>
                 </OverlayTrigger>   
             )
         } else if(weaponType === "Claymore"){
@@ -426,7 +449,7 @@ function Items(){
                 </Tooltip>
             }
             >
-                <GiPiercingSword roundedCircle size='25' className='overlay-top' style={{borderRadius: '50%', padding: '3px'}}/>
+                <GiPiercingSword size='25' className='overlay-top' style={{borderRadius: '50%', padding: '3px'}}/>
                 </OverlayTrigger>              
             )
         }
@@ -434,24 +457,24 @@ function Items(){
 
     if(loading){
         return(
-            <>
-        <Container fluid>
-            <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
-                <div style={{display: 'flex', alignItems: 'center'}}>
-                    <FaGem size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
-                    <h1 style={{display: "inline-block"}}>Needed Item Summary</h1>
-                </div>   
-            </Row>
-            <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
-                <p>What you entered all that information for!</p>
-            </Row>
-            <Row className="justify-content-md-center">
-                <p>Loading...</p>
-                <Spinner variant="primary" animation="border" role="status">
-                    <span className="sr-only">Loading...</span>
-                </Spinner>
-            </Row>
-        </Container>
+        <>
+            <Container fluid>
+                <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
+                    <div style={{display: 'flex', alignItems: 'center'}}>
+                        <FaGem size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
+                        <h1 style={{display: "inline-block"}}>Needed Item Summary</h1>
+                    </div>   
+                </Row>
+                <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
+                    <p>What you entered all that information for!</p>
+                </Row>
+                <Row className="justify-content-md-center">
+                    <p>Loading...</p>
+                    <Spinner variant="primary" animation="border" role="status">
+                        <span className="sr-only">Loading...</span>
+                    </Spinner>
+                </Row>
+            </Container>
         </>     
     );}
     return(
@@ -477,10 +500,13 @@ function Items(){
                     <Card.Body>
                         <Row className="justify-content-md-center">
                             {Object.keys(userItems).map((item, i) => {
-                                var itemName = Object.keys(userItems)[i];
+                                var itemName = userItems[item].name;
+                                if(Number(userItems[item].item_id) === 1){
+                                    return;
+                                }                  
                                 return (
                                     <Fragment key={itemName}>
-                                        {imageWithToolTipIfAmount('Item', itemName, item.needed)}
+                                        {imageWithToolTipIfAmount('Item', itemName, userItems[item].needed)}
                                     </Fragment>
                                 )
                             })}
@@ -592,7 +618,7 @@ function Items(){
                                 return (
                                     <Fragment key={monsterName}>
                                         <Card className='sum-card' key={monsterName + '1'}>
-                                        <Card.Img  variant="top" src={getItemImage('Monster', monsterName)} style={{padding: '5px'}} className='sum-card-img' style={getRarityGradient(5)}/>
+                                        <Card.Img variant="top" src={getItemImage('Monster', monsterName)} className='sum-card-img' style={getRarityGradient(5)}/>
                                             <Card.Header key={monsterName  + '2'} style={getRarityFrame(5)}>
                                                 <h5 className='genshin-font'>{monsterName}</h5>
                                             </Card.Header>
@@ -652,43 +678,49 @@ function Items(){
                                                         <Col>
                                                             <p style={{margin: 0}}>Mon/Thurs</p>
                                                             <div key={domainName  + '3'}>                              
-                                                                {Object.keys(domainItems[item][1]).map((item2, j) => {
-                                                                    var itemName = Object.keys(domainItems[item][1])[j];
-                                                                    return (
-                                                                        <Fragment key={itemName}>
-                                                                            {imageWithToolTipIfAmount('Item', itemName, domainItems[item][1][item2])}
-                                                                            
-                                                                        </Fragment>
-                                                                    );
-                                                                })}
+                                                                { domainItems[item][1] ?
+                                                                        Object.keys(domainItems[item][1]).map((item2, j) => {
+                                                                            var itemName = Object.keys(domainItems[item][1])[j];
+                                                                            return (
+                                                                                <Fragment key={itemName}>
+                                                                                    {imageWithToolTipIfAmount('Item', itemName, domainItems[item][1][item2])}
+                                                                                    
+                                                                                </Fragment>
+                                                                            );
+                                                                        })
+                                                                : ''}
                                                             </div>
                                                         </Col>
                                                         <Col>
                                                             <p style={{margin: 0}}>Tues/Fri</p>
                                                             <div key={domainName  + '3'}>                              
-                                                                {Object.keys(domainItems[item][2]).map((item2, j) => {
-                                                                    var itemName = Object.keys(domainItems[item][2])[j];
-                                                                    return (
-                                                                        <Fragment key={itemName}>
-                                                                            {imageWithToolTipIfAmount('Item', itemName, domainItems[item][2][item2])}
-                                                                            
-                                                                        </Fragment>
-                                                                    );
-                                                                })}
+                                                                {domainItems[item][2] ?
+                                                                        Object.keys(domainItems[item][2]).map((item2, j) => {
+                                                                            var itemName = Object.keys(domainItems[item][2])[j];
+                                                                            return (
+                                                                                <Fragment key={itemName}>
+                                                                                    {imageWithToolTipIfAmount('Item', itemName, domainItems[item][2][item2])}
+                                                                                    
+                                                                                </Fragment>
+                                                                            );
+                                                                        })
+                                                                : ''}
                                                             </div>
                                                         </Col>
                                                         <Col>
                                                             <p style={{margin: 0}}>Wed/Sat</p>
                                                             <div key={domainName  + '3'}>                              
-                                                                {Object.keys(domainItems[item][3]).map((item2, j) => {
-                                                                    var itemName = Object.keys(domainItems[item][3])[j];
-                                                                    return (
-                                                                        <Fragment key={itemName}>
-                                                                            {imageWithToolTipIfAmount('Item', itemName, domainItems[item][3][item2])}
-                                                                            
-                                                                        </Fragment>
-                                                                    );
-                                                                })}
+                                                                {domainItems[item][3] ?
+                                                                        Object.keys(domainItems[item][3]).map((item2, j) => {
+                                                                            var itemName = Object.keys(domainItems[item][3])[j];
+                                                                            return (
+                                                                                <Fragment key={itemName}>
+                                                                                    {imageWithToolTipIfAmount('Item', itemName, domainItems[item][3][item2])}
+                                                                                    
+                                                                                </Fragment>
+                                                                            );
+                                                                        })
+                                                                : ''}
                                                             </div>
                                                         </Col>
                                                     </Row>

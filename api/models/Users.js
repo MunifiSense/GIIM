@@ -4,8 +4,7 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Users', {
     user_id: {
-      autoIncrement: true,
-      type: DataTypes.INTEGER(11),
+      type: DataTypes.STRING(50),
       allowNull: false,
       primaryKey: true
     },
@@ -13,11 +12,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(100),
       allowNull: false,
       unique: true
-    },
-    id: {
-      type: DataTypes.STRING(100),
-      allowNull: false
-    },
+    },   
     token: {
       type: DataTypes.STRING(2048),
       allowNull: false

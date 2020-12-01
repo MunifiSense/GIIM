@@ -288,8 +288,6 @@ p{
 
 .searchBar{
   font-family: Roboto;
-  font-size: 15px;
-  height: 35px;
 }
 
 .footer {
@@ -340,4 +338,9 @@ p{
   bottom: 10px; 
   right: 10px; 
   margin-right: -100px;
+}
+
+.custom-option:hover{
+  background-color:#eeeeee;
+  user-select: none;
 }

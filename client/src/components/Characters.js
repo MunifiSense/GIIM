@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {addUserCharacter, getAllCharacters, getUserCharacters, updateUserCharacter, removeUserCharacter} from "../services/CharacterService";
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
@@ -13,27 +13,42 @@ import cellEditFactory from 'react-bootstrap-table2-editor';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import {FaSortUp, FaSortDown} from 'react-icons/fa';
 import filterFactory, { selectFilter } from 'react-bootstrap-table2-filter';
-import Select from "react-dropdown-select";
+import Select from 'react-select';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Card from "react-bootstrap/esm/Card";
+import { userContext } from "../userContext";
+import {cloneDeep, indexOf} from "lodash";
+const set = require('set-value');
 const { SearchBar } = Search;
 
 function Characters(){
+    const user = useContext(userContext);
     const [characters, setCharacters] = useState([]);
     const [userCharacters, setUserCharacters] = useState([]);
     const [characterData, setCharacterData] = useState([]);
     const [changed, setChanged] = useState(false);
     const [show, setShow] = useState(false);
     const [toBeDeleted, setToBeDeleted] = useState({});
+    const [addValue, setAddValue] = useState();
+    const [removeValue, setRemoveValue] = useState();
+    const [loading, setLoading] = useState(true);
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-    const id = 1;
+
     const selectOptions = {
         0: '-',
         1: '✓'
     };
+
+    const editableHeader = {
+        backgroundColor: '#303030', 
+        position: 'sticky', 
+        top: '50px', 
+        zIndex: '1', 
+        boxShadow: 'inset 1px 0px white, 0 2px white',
+        height: '100px'
+    };
+
     const columns = [{
         dataField: `character_id`,
         hidden: true
@@ -44,7 +59,7 @@ function Characters(){
         sortCaret: sortingThing,
         editable: false,
         style: {borderRight: '1px solid white', width: '175px'},
-        headerStyle: {borderRight: '1px solid white', width: '175px'},
+        headerStyle: {backgroundColor: '#424242', borderRight: '1px solid white', width: '175px', position: 'sticky', top: '50px', zIndex: '1', boxShadow: '1px 0px white, 0 2px white'},
         formatter: imageFormatter
     },{
         dataField: `Users[0].UserCharacters.level`,
@@ -53,7 +68,7 @@ function Characters(){
         sortCaret: sortingThing,
         validator: checkLevel,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.desired_level`,
         text: `Desired Level`,
@@ -61,7 +76,7 @@ function Characters(){
         sortCaret: sortingThing,
         validator: checkDesiredLevel,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.ascended`,
         text: `Ascended`,
@@ -77,7 +92,7 @@ function Characters(){
         sort: true,
         sortCaret: sortingThing,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.ascend_next_max`,
         text: `Ascend On Max?`,
@@ -93,7 +108,7 @@ function Characters(){
         sort: true,
         sortCaret: sortingThing,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.normal_atk_level`,
         text: `Normal Attack Level`,
@@ -101,7 +116,7 @@ function Characters(){
         sortCaret: sortingThing,
         validator: checkNTalent,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.normal_atk_desired_level`,
         text: `Normal Attack Desired Level`,
@@ -109,7 +124,7 @@ function Characters(){
         sortCaret: sortingThing,
         validator: checkNDesiredTalent,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.q_atk_level`,
         text: `Q Attack Level`,
@@ -117,7 +132,7 @@ function Characters(){
         sortCaret: sortingThing,
         validator: checkQTalent,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.q_atk_desired_level`,
         text: `Q Attack Desired Level`,
@@ -125,7 +140,7 @@ function Characters(){
         sortCaret: sortingThing,
         validator: checkQDesiredTalent,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.e_atk_level`,
         text: `E Attack Level`,
@@ -133,7 +148,7 @@ function Characters(){
         sortCaret: sortingThing,
         validator: checkETalent,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.e_atk_desired_level`,
         text: `E Attack Desired Level`,
@@ -141,7 +156,7 @@ function Characters(){
         sortCaret: sortingThing,
         validator: checkEDesiredTalent,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.managed`,
         text: `Managed`,
@@ -155,7 +170,7 @@ function Characters(){
             1: '✓'
         },
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'},
+        headerStyle: editableHeader,
         sort: true,
         sortCaret: sortingThing,
         filter: selectFilter({
@@ -169,6 +184,8 @@ function Characters(){
         dataField: 'name',
         order: 'asc'
     }];
+
+    
 
     function sortingThing(order, column){
         if (!order) return (
@@ -323,7 +340,7 @@ function Characters(){
             };
         }
         else if(newValue > row.Users[0].UserCharacters.normal_atk_desired_level){
-            row.Users[0].UserCharacters.q_atk_desired_level = newValue;
+            row.Users[0].UserCharacters.normal_atk_desired_level = newValue;
             return true;
         }
         return true;
@@ -377,7 +394,7 @@ function Characters(){
             };
         }
         else if(newValue > row.Users[0].UserCharacters.e_atk_desired_level){
-            row.Users[0].UserCharacters.q_atk_desired_level = newValue;
+            row.Users[0].UserCharacters.e_atk_desired_level = newValue;
             return true;
         }
         return true;
@@ -414,6 +431,8 @@ function Characters(){
     useEffect(() =>{
         retrieveCharactersInfo();
         retrieveUserCharacters();
+        setLoading(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function retrieveCharactersInfo(){
@@ -426,68 +445,131 @@ function Characters(){
     };
 
     function retrieveUserCharacters(){
-        getUserCharacters(id).then(response => {
-            setUserCharacters(response.data);
-            console.log(response.data);
-        }).catch(e => {
-            console.log(e);
-        });
+        if(user){
+            getUserCharacters().then(response => {
+                setUserCharacters(response.data);
+                console.log(response.data);
+            }).catch(e => {
+                console.log(e);
+            });
+        }else{
+            // If not signed in and no userCharacters stored locally...
+            var localUserCharData = localStorage.getItem("userCharacters");
+            if(!localUserCharData){
+                localStorage.setItem("userCharacters", JSON.stringify([]));
+            }else{
+                setUserCharacters(JSON.parse(localUserCharData));
+            }
+        }
+        
     };
 
     function AddUserCharacter(cid){
-        const data ={
-            userid: id,
-            charid: cid
-        };
-        addUserCharacter(data)
-        .then(response => {
-            console.log(response.data);
-            console.log("The user character was added successfully!");
-            retrieveUserCharacters();
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        if(user){
+            const data ={
+                charid: cid
+            };
+            addUserCharacter(data)
+            .then(response => {
+                console.log(response.data);
+                console.log("The user character was added successfully!");
+                retrieveUserCharacters();
+            })
+            .catch(e => {
+                console.log(e);
+            });
+        }else{
+            const charIndex = characters.findIndex((element) => element.character_id === cid);
+            const newUserChar = characters[charIndex];
+            newUserChar.Users = [];
+            newUserChar.Users[0]= {};
+            set(newUserChar.Users[0], 'UserCharacters.character_id', cid)
+            set(newUserChar.Users[0], 'UserCharacters.level', 1);
+            set(newUserChar.Users[0], 'UserCharacters.desired_level', 1);
+            set(newUserChar.Users[0], 'UserCharacters.ascended', 0);
+            set(newUserChar.Users[0], 'UserCharacters.ascend_next_max', 0);
+            set(newUserChar.Users[0], 'UserCharacters.normal_atk_level', 1);
+            set(newUserChar.Users[0], 'UserCharacters.normal_atk_desired_level', 1);
+            set(newUserChar.Users[0], 'UserCharacters.q_atk_level', 1);
+            set(newUserChar.Users[0], 'UserCharacters.q_atk_desired_level', 1);
+            set(newUserChar.Users[0], 'UserCharacters.e_atk_level', 1);
+            set(newUserChar.Users[0], 'UserCharacters.e_atk_desired_level', 1);
+            set(newUserChar.Users[0], 'UserCharacters.managed', 1);
+            const newUserCharacters = cloneDeep(userCharacters);
+            newUserCharacters.push(newUserChar);
+            setUserCharacters(newUserCharacters);
+            localStorage.setItem("userCharacters", JSON.stringify(newUserCharacters));
+        }
     };
 
     function UpdateUserCharacter(value){
-        console.log(value);
-        const data ={
-            userid: id,
-            charid: value.character_id,
-            level: value.level,
-            desired_level: value.desired_level,
-            ascended: value.ascended,
-            ascend_next_max: value.ascend_next_max,
-            normal_atk_level: value.normal_atk_level,
-            normal_atk_desired_level: value.normal_atk_desired_level,
-            q_atk_level: value.q_atk_level,
-            q_atk_desired_level: value.q_atk_desired_level,
-            e_atk_level: value.e_atk_level,
-            e_atk_desired_level: value.e_atk_desired_level,
-            managed: value.managed
-        };
-        updateUserCharacter(data)
-        .then(response => {
-            console.log(response.data);
-            console.log("The user character was updated successfully!");
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        if(user){
+            const data ={
+                charid: value.character_id,
+                level: value.level,
+                desired_level: value.desired_level,
+                ascended: value.ascended,
+                ascend_next_max: value.ascend_next_max,
+                normal_atk_level: value.normal_atk_level,
+                normal_atk_desired_level: value.normal_atk_desired_level,
+                q_atk_level: value.q_atk_level,
+                q_atk_desired_level: value.q_atk_desired_level,
+                e_atk_level: value.e_atk_level,
+                e_atk_desired_level: value.e_atk_desired_level,
+                managed: value.managed
+            };
+            updateUserCharacter(data)
+            .then(response => {
+                console.log(response.data);
+                console.log("The user character was updated successfully!");
+            })
+            .catch(e => {
+                console.log(e);
+            });
+        }else{
+            const indexOfChar = userCharacters.findIndex((chara) => chara.character_id === value.character_id);
+            console.log(value);
+            console.log(indexOfChar);
+            const newUserChar = userCharacters[indexOfChar];
+            set(newUserChar.Users[0], 'UserCharacters.level', value.level);
+            set(newUserChar.Users[0], 'UserCharacters.desired_level', value.desired_level);
+            set(newUserChar.Users[0], 'UserCharacters.ascended', value.ascended);
+            set(newUserChar.Users[0], 'UserCharacters.ascend_next_max', value.ascend_next_max);
+            set(newUserChar.Users[0], 'UserCharacters.normal_atk_level', value.normal_atk_level);
+            set(newUserChar.Users[0], 'UserCharacters.normal_atk_desired_level',value.normal_atk_desired_level);
+            set(newUserChar.Users[0], 'UserCharacters.q_atk_level', value.q_atk_level);
+            set(newUserChar.Users[0], 'UserCharacters.q_atk_desired_level', value.q_atk_desired_level);
+            set(newUserChar.Users[0], 'UserCharacters.e_atk_level', value.e_atk_level);
+            set(newUserChar.Users[0], 'UserCharacters.e_atk_desired_level', value.e_atk_desired_level);
+            set(newUserChar.Users[0], 'UserCharacters.managed', value.managed);
+            const newUserCharacters = cloneDeep(userCharacters);
+            newUserCharacters[indexOfChar] = newUserChar;
+            setUserCharacters(newUserCharacters);
+            localStorage.setItem("userCharacters", JSON.stringify(newUserCharacters));
+        }
+        
     }; 
 
     function RemoveUserCharacter(cid){
-        removeUserCharacter(id, cid)
-        .then(response => {
-            console.log(response.data);
-            retrieveCharactersInfo();
-            retrieveUserCharacters();
-            console.log("The user character was removed successfully!");
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        if(user){
+            removeUserCharacter(cid)
+            .then(response => {
+                console.log(response.data);
+                retrieveCharactersInfo();
+                retrieveUserCharacters();
+                console.log("The user character was removed successfully!");
+            })
+            .catch(e => {
+                console.log(e);
+            });
+        }else{
+            const newUserCharacters = cloneDeep(userCharacters);
+            newUserCharacters.splice(newUserCharacters.findIndex(chara => chara.character_id === cid), 1);
+            setUserCharacters(newUserCharacters);
+            localStorage.setItem("userCharacters", JSON.stringify(newUserCharacters));
+        }
+        //populateAddUsers();
+        //populateRemoveUsers();
     };
 
     function IsCharNotAdded(value){
@@ -509,6 +591,47 @@ function Characters(){
         </span>
         )
     }
+
+    function populateAddUsers(){
+        const newAddUsers = [];
+        characters.filter(IsCharNotAdded).forEach((element) => {
+            newAddUsers.push({
+                value: element.character_id,
+                label: element.name,
+                image: 'https://muni.moe/images/genshin/Character_'+ element.name +'_Thumb.png'
+            });
+        });
+        newAddUsers.sort((a, b) => {
+            return a.label > b.label ? 1 : b.label > a.label ? -1 : 0;
+        });
+        return newAddUsers;
+    }
+
+    function populateRemoveUsers(){
+        const newRemoveUsers = [];
+        userCharacters.forEach((element) => {
+            newRemoveUsers.push({
+                value: element.character_id,
+                label: element.name,
+                image: 'https://muni.moe/images/genshin/Character_'+ element.name +'_Thumb.png'
+            });
+        });
+        newRemoveUsers.sort((a, b) => {
+            return a.label > b.label ? 1 : b.label > a.label ? -1 : 0;
+        });
+       return newRemoveUsers;
+    }
+
+    const CustomOption = props => {
+        const { innerProps, innerRef, isDisabled } = props;
+        return (!isDisabled ? (
+            <div ref={innerRef} {...innerProps} className="custom-option"> 
+                <img src={props.data.image} style={{height: '32px', width: '32px', marginRight: "5px", display: 'inline-block', verticalAlign: 'middle', padding: '2px'} } alt= {props.data.label}/>
+                {props.data.label}
+            </div>
+        ) : null);
+    }
+        
 
     function saveChanged(){
         setChanged(false);
@@ -543,7 +666,7 @@ function Characters(){
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to remove {toBeDeleted.name} from your roster?
+                    Are you sure you want to remove {toBeDeleted ? toBeDeleted.label : ''} from your roster?
                     <br></br>Doing so will wipe all data relating to them!<br></br>
                     <b>TIP: If you set a character to not managed, they won't show up by default.</b>
                 </Modal.Body>
@@ -553,7 +676,7 @@ function Characters(){
                 </Button>
                 <Button variant="primary" onClick={() => {
                     handleClose();
-                    RemoveUserCharacter(toBeDeleted.character_id);
+                    RemoveUserCharacter(toBeDeleted.value);
                 }             
                     }>
                     Yes
@@ -578,42 +701,40 @@ function Characters(){
                                     <div style={{width: '300px', display: "inline-block"}}>
                                         <Select 
                                             className="my-dropdown"
-                                            options={characters.filter(IsCharNotAdded)} 
-                                            values={[]} 
-                                            valueField="character_id" 
-                                            labelField="name" 
-                                            searchBy="name" 
-                                            sortBy="name"
+                                            value = {addValue}
+                                            options={populateAddUsers()} 
                                             onChange={
-                                                (value) => AddUserCharacter(value[0].character_id)
+                                                (value) => {
+                                                    AddUserCharacter(value.value);
+                                                    setAddValue(null);
+                                                }
                                             }
-                                            closeOnSelect
                                             placeholder="Select character to add..."
-                                            dropdownGap = {-2}
-                                            dropdownPosition= "auto"
-                                            clearOnSelect={true}
+                                            components = {{
+                                                Option: CustomOption
+                                            }}
+                                            isClearable
                                         />
                                     </div>
                                     <div  style={{width: '300px', paddingLeft: '10px', display: "inline-block"}}>
                                         <Select
-                                            className="my-dropdown" 
-                                            options={userCharacters} 
-                                            values={[]} 
-                                            valueField="character_id" 
-                                            labelField="name" 
-                                            searchBy="name" 
-                                            sortBy="name" 
+                                            className="my-dropdown"
+                                            value = {removeValue} 
+                                            options={populateRemoveUsers()}
                                             onChange={
                                                 (value) => {
-                                                    setToBeDeleted(value[0]);
-                                                    setShow(true);
+                                                    if(value !== undefined){
+                                                        setToBeDeleted(value);
+                                                        setShow(true);
+                                                        setRemoveValue(null);
+                                                    }
                                                 }
                                             }
-                                            closeOnSelect
                                             placeholder="Select character to remove..."
-                                            dropdownGap = {-2}
-                                            dropdownPosition= "auto"
-                                            clearOnSelect={true}
+                                            components = {{
+                                                Option: CustomOption
+                                            }}
+                                            isClearable   
                                         />
                                     </div>
                                 </div>                                
@@ -641,7 +762,7 @@ function Characters(){
                                 bordered= {false}
                                 filter={ filterFactory() }
                                 noDataIndication={() => (
-                                    <Spinner animation="border" variant="light" />
+                                    loading ? <Spinner animation="border" variant="light" /> : <p>No Data</p>
                                 )}
                                 { ...props.baseProps } />
                         </div>

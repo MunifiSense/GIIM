@@ -1,19 +1,20 @@
 module.exports = app => {
-    const userWeapons = require("../controllers/UserWeapons.controller.js");
+  const userWeapons = require("../controllers/UserWeapons.controller.js");
+  const auth = require("../controllers/Auth.controller.js");
   
-    var router = require("express").Router();
-  
-    // Retrieve weapon with user id
-    router.get("/:id", userWeapons.getUserWeapons);
+  var router = require("express").Router();
 
-    // Add weapon wtih user id
-    router.post("/", userWeapons.addUserWeapon);
+  // Retrieve weapon with user id
+  router.get("/", auth.authenticate, userWeapons.getUserWeapons);
 
-    // Update weapon with user id
-    router.put("/", userWeapons.updateUserWeapon);
+  // Add weapon wtih user id
+  router.post("/", auth.authenticate, userWeapons.addUserWeapon);
 
-    // Delete weapon with user id
-    router.delete("/:id", userWeapons.removeUserWeapon);
-  
-    app.use('/api/userweapons', router);
-  };
+  // Update weapon with user id
+  router.put("/", auth.authenticate, userWeapons.updateUserWeapon);
+
+  // Delete weapon with user id
+  router.delete("/:weaponid", auth.authenticate, userWeapons.removeUserWeapon);
+
+  app.use('/api/userweapons', router);
+};

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ProSidebar, Menu, MenuItem, SidebarContent} from 'react-pro-sidebar';
 import { IconContext } from 'react-icons';
 import { FaBars, FaGem, FaHeart, FaHome } from 'react-icons/fa';
@@ -16,9 +16,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import 'react-pro-sidebar/dist/css/styles.css';
 import "./App.css";
 import {refreshTokenSetup} from './tools/refreshToken';
-import {authenticate} from './services/AuthService';
-import { useDispatch, useSelector } from "react-redux";
-import {login} from "./redux/actions/auth";
+import {authenticate, authlogout, getCurrentUser} from './services/AuthService';
+import {getLocalUserCharacters, addUserCharacter} from './services/CharacterService';
+import {getLocalUserWeapons, addUserWeapon} from './services/WeaponService';
+import {getLocalUserItems, updateUserItem} from './services/ItemService';
 
 import Home from "./components/Main";
 import Characters from "./components/Characters";
@@ -27,34 +28,99 @@ import Items from "./components/Items";
 import ItemSummary from "./components/ItemSummary";
 import Suggestions from "./components/Suggestions";
 
-import Collapse from "react-bootstrap/esm/Collapse";
-import Container from "react-bootstrap/esm/Container";
+import Collapse from "react-bootstrap/Collapse";
+import Container from "react-bootstrap/Container";
+
+import {userContext} from './userContext';
 
 function App (){
   const [collapsed, setCollapsed] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
-
-  const [user, setUser] = React.useState(null);
-  const [token, setToken] = React.useState('');
-
-  const {isLoggedIn} = useSelector(state => state.auth);
-
-  const dispatch = useDispatch();
+  const {user} = useState(getCurrentUser());
 
   const loginSuccess = (response) => {
     console.log(response);
     refreshTokenSetup(response);
-    // Verify token and create user if doesn't exist
-    
-    dispatch(login(response));
+    authenticate(response.tokenId).then( () => {
+      // Check if local x exists
+      const localUserCharacters = getLocalUserCharacters();
+      const localUserWeapons = getLocalUserWeapons();
+      const localUserItems = getLocalUserItems();
+      if(localUserCharacters){
+        localUserCharacters.forEach(element => {
+          const data ={
+            charid: element.character_id,
+            level: element.Users[0].UserCharacters.level,
+            desired_level: element.Users[0].UserCharacters.desired_level,
+            ascended: element.Users[0].UserCharacters.ascended,
+            ascend_next_max: element.Users[0].UserCharacters.ascend_next_max,
+            normal_atk_level: element.Users[0].UserCharacters.normal_atk_level,
+            normal_atk_desired_level: element.Users[0].UserCharacters.normal_atk_desired_level,
+            q_atk_level: element.Users[0].UserCharacters.q_atk_level,
+            q_atk_desired_level: element.Users[0].UserCharacters.q_atk_desired_level,
+            e_atk_level: element.Users[0].UserCharacters.e_atk_level,
+            e_atk_desired_level: element.Users[0].UserCharacters.e_atk_desired_level,
+            managed: element.Users[0].UserCharacters.managed
+          };
+          addUserCharacter(data)
+          .then(response => {
+              
+          })
+          .catch(e => {
+              console.log(e);
+          });
+        });
+        localStorage.removeItem("userCharacters");
+      } 
+
+      if(localUserWeapons){
+        localUserWeapons.forEach(element => {
+          const data ={
+            weaponid: element.weapon_id,
+            level: element.Users[0].UserWeapons.level,
+            desired_level: element.Users[0].UserWeapons.desired_level,
+            ascended: element.Users[0].UserWeapons.ascended,
+            ascend_next_max: element.Users[0].UserWeapons.ascend_next_max,
+            managed: element.Users[0].UserWeapons.managed
+          };
+          addUserWeapon(data)
+          .then(response => {
+              
+          })
+          .catch(e => {
+              console.log(e);
+          });
+        });
+        localStorage.removeItem("userWeapons");
+      }
+
+      if(localUserItems){
+        localUserItems.forEach(element => {
+          const data ={
+            itemid: element.item_id,
+            amount: element.Users[0].UserItems.amount.amount,
+            forge: element.Users[0].UserItems.amount.forge
+          };
+          updateUserItem(data)
+          .then(response => {
+              
+          })
+          .catch(e => {
+              console.log(e);
+          });
+        });
+        localStorage.removeItem("userItems");
+      }
+    });
   }
 
   const loginFail = (response) => {
     console.log(response);
   }
 
-  const logout = (response) => {
-    dispatch(logout);
+  const logout = () => {
+    //logout
+    authlogout();
   }
 
   return(
@@ -80,7 +146,7 @@ function App (){
                 </Navbar.Brand>
               </div>
               <div style={{position: 'fixed', right: '10px'}}>
-                {!isLoggedIn? 
+                {!user? 
                   <GoogleLogin
                       clientId="871403107294-7if7ber7cm2po4t5nnrvvdogpsp09t0l.apps.googleusercontent.com"
                       buttonText="Login with Google"
@@ -139,14 +205,16 @@ function App (){
         <div className={menuOpen ? 
           (collapsed? "content shift-collapsed" : "content shift" )
           : "content no-shift"}>
-          <Switch>
-              <Route exact path="/" component={Home} />
-              <Route exact path="/team" component={Characters} />
-              <Route exact path="/weapons" component={Weapons} />
-              <Route exact path="/items" component={Items} />
-              <Route exact path="/itemsummary" component={ItemSummary} />
-              <Route exact path="/suggestions" component={Suggestions} />
-          </Switch>
+          <userContext.Provider value={user}>
+            <Switch>
+                <Route exact path="/" component={Home} />
+                <Route exact path="/team" component={Characters} />
+                <Route exact path="/weapons" component={Weapons} />
+                <Route exact path="/items" component={Items} />
+                <Route exact path="/itemsummary" component={ItemSummary} />
+                <Route exact path="/suggestions" component={Suggestions} />
+            </Switch>
+          </userContext.Provider>
         </div>
         <div className={menuOpen ? 
           (collapsed? "footer shift-collapsed" : "footer shift" )

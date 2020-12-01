@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {addUserItems, getAllItems, getUserItems, updateUserItem} from "../services/ItemService";
+import React, { useEffect, useState, useContext  } from "react";
+import {getAllItems, getUserItems, updateUserItem} from "../services/ItemService";
 import {retrieveNeeded, checkForge} from "../tools/ItemCalc";
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
@@ -12,17 +12,21 @@ import cellEditFactory from 'react-bootstrap-table2-editor';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import {FaSortUp, FaSortDown} from 'react-icons/fa';
 import filterFactory, { numberFilter, Comparator } from 'react-bootstrap-table2-filter';
-import { GiSwapBag } from 'react-icons/gi';
+import { GiConsoleController, GiSwapBag } from 'react-icons/gi';
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { userContext } from "../userContext";
+import {cloneDeep} from "lodash";
+const set = require('set-value');
 const { SearchBar } = Search;
 
 function Items(){
+    const user = useContext(userContext);
     const [items, setItems] = useState([]);
     const [userItems, setUserItems] = useState([]);
     const [itemData, setItemData] = useState([]);
     const [changed, setChanged] = useState(false);
-    const id = 1;
+    const [loading, setLoading] = useState(true);
     const columns = [{
         dataField: `item_id`,
         hidden: true
@@ -134,7 +138,7 @@ function Items(){
     }];
 
     const defaultSorted = [{
-        dataField: 'id',
+        dataField: 'game_sort_order',
         order: 'asc'
     }];
 
@@ -164,7 +168,12 @@ function Items(){
     }
 
     useEffect(() =>{
-        retrieveStuff();
+        (async function retrieveStuff() {
+            setItems(await retrieveItemsInfo());
+            setUserItems(await retrieveNeeded(user, await retrieveUserItems()));
+            setLoading(false);
+        }) ();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function forgeFormatter(cell, row, rowIndex, formatExtraData) {
@@ -176,10 +185,11 @@ function Items(){
         )
     }
 
-    async function retrieveStuff(){
+    /*async function retrieveStuff(){
         setItems(await retrieveItemsInfo());
         setUserItems(await retrieveNeeded(await retrieveUserItems()));
-    }
+        setLoading(false);
+    }*/
 
     async function retrieveItemsInfo(){
         return new Promise(function(resolve, reject) {
@@ -192,15 +202,34 @@ function Items(){
     };
 
     async function retrieveUserItems(){
-        return new Promise(function(resolve, reject) {
-            getUserItems(id).then(response => {
-                if(response.data.length < items.length){
-                    AddUserItems();
+        return new Promise(function(resolve, reject) {         
+            if(user){
+                getUserItems().then(response => {
+                    resolve(response.data);
+                }).catch(e => {
+                    console.log(e);
+                });
+            }else{
+                // If not signed in and no userItems stored locally...
+                var localUserItemData = JSON.parse(localStorage.getItem("userItems"));
+                if(!localUserItemData || localUserItemData.length === 0){
+                    const newUserItems = [];
+                    items.forEach(element => {
+                        console.log("aaa");
+                        const newUserItem = element;
+                        newUserItem.Users = [];
+                        newUserItem.Users[0]= {};
+                        set(newUserItem.Users[0], 'UserItems.amount', 0);
+                        set(newUserItem.Users[0], 'UserItems.forge', 0);
+                        newUserItems.push(newUserItem);               
+                    }) 
+                    setUserItems(newUserItems);     
+                    localStorage.setItem("userItems", JSON.stringify(newUserItems));
+                    resolve(newUserItems);
+                }else{
+                    resolve(localUserItemData);
                 }
-                resolve(response.data);
-            }).catch(e => {
-                console.log(e);
-            });
+            }
         })
     };
 
@@ -243,33 +272,49 @@ function Items(){
     }
 
     function AddUserItems(){
-        addUserItems(id)
-        .then(response => {
-            console.log(response.data);
-            console.log("The user item was added successfully!");
-            retrieveUserItems();
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        if(user){
+            
+        }else{
+            const newUserItems = cloneDeep(userItems);
+            items.forEach(element => {
+                const newUserItem = element;
+                newUserItem.Users = [];
+                newUserItem.Users[0]= {};
+                set(newUserItem.Users[0], 'UserItems.item_id', element.item_id);
+                set(newUserItem.Users[0], 'UserItems.amount', 0);
+                set(newUserItem.Users[0], 'UserItems.forge', 0);
+                newUserItems.push(newUserItem);               
+            }) 
+            setUserItems(newUserItems);     
+            localStorage.setItem("userItems", JSON.stringify(newUserItems));
+        }     
     };
 
     function UpdateUserItem(value){
-        console.log(value);
-        const data ={
-            userid: id,
-            itemid: value.item_id,
-            amount: value.amount,
-            forge: value.forge
-        };
-        updateUserItem(data)
-        .then(response => {
-            console.log(response.data);
-            console.log("The user item was updated successfully!");
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        if(user){
+            const data ={
+                itemid: value.item_id,
+                amount: value.amount,
+                forge: value.forge
+            };
+            updateUserItem(data)
+            .then(response => {
+                console.log(response.data);
+                console.log("The user item was updated successfully!");
+            })
+            .catch(e => {
+                console.log(e);
+            });
+        }else{
+            const indexOfItem = itemData.findIndex(itema => itema.item_id === value.item_id);
+            const newUserItem = itemData[indexOfItem];
+                set(newUserItem.Users[0], 'UserItems.amount', value.amount);
+                set(newUserItem.Users[0], 'UserItems.forge', value.forge);
+                const newUserItems = cloneDeep(userItems);
+                newUserItems.push(newUserItem);
+                setUserItems(newUserItems);
+                localStorage.setItem("userItems", JSON.stringify(newUserItems));
+        }
     }; 
 
     function saveChanged(){
@@ -336,7 +381,7 @@ function Items(){
                                 bordered={false}
                                 filter={ filterFactory() }
                                 noDataIndication={() => (
-                                    <Spinner animation="border" variant="light" />
+                                    loading ? <Spinner animation="border" variant="light" /> : <p>No Data</p>
                                 )}
                                 { ...props.baseProps } />
                         </div>

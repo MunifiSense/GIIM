@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {addUserWeapon, getAllWeapons, getUserWeapons, updateUserWeapon, removeUserWeapon} from "../services/WeaponService";
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
@@ -13,13 +13,17 @@ import cellEditFactory from 'react-bootstrap-table2-editor';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import {FaSortUp, FaSortDown} from 'react-icons/fa';
 import filterFactory, { selectFilter } from 'react-bootstrap-table2-filter';
-import Select from "react-dropdown-select";
+import Select from 'react-select';
 import { RiSwordFill } from 'react-icons/ri';
+import { userContext } from "../userContext";
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import {cloneDeep} from "lodash";
 const { SearchBar } = Search;
+const set = require('set-value');
 
 function Weapons(){
+    const user = useContext(userContext);
     const [weapons, setWeapons] = useState([]);
     const [userWeapons, setUserWeapons] = useState([]);
     const [weaponData, setWeaponData] = useState([]);
@@ -27,8 +31,9 @@ function Weapons(){
     const [show, setShow] = useState(false);
     const [toBeDeleted, setToBeDeleted] = useState({});
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-    const id = 1;
+    const [addValue, setAddValue] = useState();
+    const [removeValue, setRemoveValue] = useState();
+    const [loading, setLoading] = useState(true);
     const selectOptions = {
         0: '-',
         1: '✓'
@@ -64,6 +69,22 @@ function Weapons(){
     },{
         dataField: `Users[0].UserWeapons.ascended`,
         text: `Ascended`,
+        editor: {
+            type: Type.CHECKBOX,
+            value: '1:0'
+        },
+        formatter: boolFormatter,
+        formatExtraData: {
+            0: '-',
+            1: '✓'
+        },
+        sort: true,
+        sortCaret: sortingThing,
+        style: {backgroundColor: '#303030'},
+        headerStyle: {backgroundColor: '#303030'}
+    },{
+        dataField: `Users[0].UserWeapons.ascend_next_max`,
+        text: `Ascend On Max?`,
         editor: {
             type: Type.CHECKBOX,
             value: '1:0'
@@ -187,6 +208,8 @@ function Weapons(){
     useEffect(() =>{
         retrieveWeaponsInfo();
         retrieveUserWeapons();
+        setLoading(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function retrieveWeaponsInfo(){
@@ -199,60 +222,109 @@ function Weapons(){
     };
 
     function retrieveUserWeapons(){
-        getUserWeapons(id).then(response => {
-            setUserWeapons(response.data);
-            console.log(response.data);
-        }).catch(e => {
-            console.log(e);
-        });
+        if(user){
+            getUserWeapons().then(response => {
+                setUserWeapons(response.data);
+                console.log(response.data);
+            }).catch(e => {
+                console.log(e);
+            });
+        }else{
+            // If not signed in and no userWeapons stored locally...
+            var localUserWeaponData = localStorage.getItem("userWeapons");
+            if(!localUserWeaponData){
+                localStorage.setItem("userWeapons", JSON.stringify([]));
+            }else{
+                setUserWeapons(JSON.parse(localUserWeaponData));
+            }
+        }
     };
 
     function AddUserWeapon(cid){
-        const data ={
-            userid: id,
-            weaponid: cid
-        };
-        addUserWeapon(data)
-        .then(response => {
-            console.log(response.data);
-            console.log("The user weapon was added successfully!");
-            retrieveUserWeapons();
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        if(user){
+            const data ={
+                wepid: cid
+            };
+            addUserWeapon(data)
+            .then(response => {
+                console.log(response.data);
+                console.log("The user weapon was added successfully!");
+                retrieveUserWeapons();
+            })
+            .catch(e => {
+                console.log(e);
+            });
+        }else{
+            const weaponIndex = weapons.findIndex((element) => {
+                return element.weapon_id === cid;
+            });
+            const newUserWeapon = weapons[weaponIndex];
+            newUserWeapon.Users = [];
+            newUserWeapon.Users[0]= {};
+            set(newUserWeapon.Users[0], 'UserWeapons.weapon_id', cid);
+            set(newUserWeapon.Users[0], 'UserWeapons.level', 1);
+            set(newUserWeapon.Users[0], 'UserWeapons.desired_level', 1);
+            set(newUserWeapon.Users[0], 'UserWeapons.ascended', 0);
+            set(newUserWeapon.Users[0], 'UserWeapons.ascend_next_max', 0);
+            set(newUserWeapon.Users[0], 'UserWeapons.managed', 1);
+            const newUserWeapons = cloneDeep(userWeapons);
+            newUserWeapons.push(newUserWeapon);
+            setUserWeapons(newUserWeapons);
+            localStorage.setItem("userWeapons", JSON.stringify(newUserWeapons));
+        }
     };
 
     function UpdateUserWeapon(value){
-        const data ={
-            userid: id,
-            weaponid: value.weapon_id,
-            level: value.level,
-            desired_level: value.desired_level,
-            ascended: value.ascended,
-            managed: value.managed
-        };
-        updateUserWeapon(data)
-        .then(response => {
-            console.log(response.data);
-            console.log("The user weapon was updated successfully!");
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        if(user){
+            const data ={
+                weaponid: value.weapon_id,
+                level: value.level,
+                desired_level: value.desired_level,
+                ascended: value.ascended,
+                ascend_next_max: value.ascend_next_max,
+                managed: value.managed
+            };
+            updateUserWeapon(data)
+            .then(response => {
+                console.log(response.data);
+                console.log("The user weapon was updated successfully!");
+            })
+            .catch(e => {
+                console.log(e);
+            });
+        }else{
+            const indexOfWeapon = userWeapons.findIndex(weapon => weapon.weapon_id === value.weapon_id);
+            const newUserWeapon = userWeapons[indexOfWeapon];
+            set(newUserWeapon.Users[0], 'UserWeapons.level', value.level);
+            set(newUserWeapon.Users[0], 'UserWeapons.desired_level', value.desired_level);
+            set(newUserWeapon.Users[0], 'UserWeapons.ascended', value.ascended);
+            set(newUserWeapon.Users[0], 'UserWeapons.ascend_next_max', value.ascend_next_max);
+            set(newUserWeapon.Users[0], 'UserWeapons.managed', value.managed);
+            const newUserWeapons = cloneDeep(userWeapons);
+            newUserWeapons[indexOfWeapon] = newUserWeapon;
+            setUserWeapons(newUserWeapons);
+            localStorage.setItem("userWeapons", JSON.stringify(newUserWeapons));
+        }
     }; 
 
     function RemoveUserWeapon(cid){
-        removeUserWeapon(id, cid)
-        .then(response => {
-            console.log(response.data);
-            retrieveWeaponsInfo();
-            retrieveUserWeapons();
-            console.log("The user weapon was removed successfully!");
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        if(user){
+            removeUserWeapon(cid)
+            .then(response => {
+                console.log(response.data);
+                retrieveWeaponsInfo();
+                retrieveUserWeapons();
+                console.log("The user weapon was removed successfully!");
+            })
+            .catch(e => {
+                console.log(e);
+            });
+        }else{
+            const newUserWeapons = cloneDeep(userWeapons);
+            newUserWeapons.splice(newUserWeapons.findIndex(weapon => weapon.weapon_id === cid), 1);
+            setUserWeapons(newUserWeapons);
+            localStorage.setItem("userWeapons", JSON.stringify(newUserWeapons));
+        }
     };
 
     function IsWeaponNotAdded(value){
@@ -279,6 +351,46 @@ function Weapons(){
             
         </span>
         )
+    }
+
+    function populateAddUsers(){
+        const newAddUsers = [];
+        weapons.filter(IsWeaponNotAdded).forEach((element) => {
+            newAddUsers.push({
+                value: element.weapon_id,
+                label: element.name,
+                image: 'https://muni.moe/images/genshin/Weapon_'+ element.name.replace(/ /g, '_').replace(/'/g,'%27')+'.png'
+            });
+        });
+        newAddUsers.sort((a, b) => {
+            return a.label > b.label ? 1 : b.label > a.label ? -1 : 0;
+        });
+        return newAddUsers;
+    }
+
+    function populateRemoveUsers(){
+        const newRemoveUsers = [];
+        userWeapons.forEach((element) => {
+            newRemoveUsers.push({
+                value: element.weapon_id,
+                label: element.name,
+                image: 'https://muni.moe/images/genshin/Weapon_'+ element.name.replace(/ /g, '_').replace(/'/g,'%27')+'.png'
+            });
+        });
+        newRemoveUsers.sort((a, b) => {
+            return a.label > b.label ? 1 : b.label > a.label ? -1 : 0;
+        });
+       return newRemoveUsers;
+    }
+
+    const CustomOption = props => {
+        const { innerProps, innerRef, isDisabled } = props;
+        return (!isDisabled ? (
+            <div ref={innerRef} {...innerProps} className="custom-option"> 
+                <img src={props.data.image} style={{height: '32px', width: '32px', marginRight: "5px", display: 'inline-block', verticalAlign: 'middle', padding: '2px'}} alt= {props.data.label}/>
+                {props.data.label}
+            </div>
+        ) : null);
     }
 
     return(
@@ -308,7 +420,7 @@ function Weapons(){
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to remove {toBeDeleted.name} from your roster?
+                    Are you sure you want to remove {toBeDeleted ? toBeDeleted.label : ''} from your roster?
                     <br></br>Doing so will wipe all data relating to it!<br></br>
                     <b>TIP: If you set a weapon to not managed, it won't show up by default.</b>
                 </Modal.Body>
@@ -343,42 +455,40 @@ function Weapons(){
                                 <div style={{width: '300px', display: "inline-block"}}>
                                     <Select 
                                         className="my-dropdown"
-                                        options={weapons.filter(IsWeaponNotAdded)} 
-                                        values={[]} 
-                                        valueField="weapon_id" 
-                                        labelField="name" 
-                                        searchBy="name" 
-                                        sortBy="name"
-                                        onChange={
-                                            (value) => {AddUserWeapon(value[0].weapon_id)}
-                                        }
-                                        closeOnSelect
-                                        placeholder="Select weapon to add..."
-                                        dropdownGap = {-2}
-                                        dropdownPosition= "auto"
-                                        clearOnSelect={true}
-                                    />
-                                </div>
-                                <div style={{width: '300px', paddingLeft: '10px', display: "inline-block"}}>
-                                    <Select
-                                        className="my-dropdown" 
-                                        options={userWeapons} 
-                                        values={[]} 
-                                        valueField="weapon_id" 
-                                        labelField="name" 
-                                        searchBy="name" 
-                                        sortBy="name" 
+                                        value = {addValue}
+                                        options={populateAddUsers()} 
                                         onChange={
                                             (value) => {
-                                                setToBeDeleted(value[0]);
-                                                setShow(true);
+                                                AddUserWeapon(value.value);
+                                                setAddValue(null);
                                             }
                                         }
-                                        closeOnSelect
+                                        placeholder="Select weapon to add..."
+                                        components = {{
+                                            Option: CustomOption
+                                        }}
+                                        isClearable
+                                    />
+                                </div>
+                                <div  style={{width: '300px', paddingLeft: '10px', display: "inline-block"}}>
+                                    <Select
+                                        className="my-dropdown"
+                                        value = {removeValue} 
+                                        options={populateRemoveUsers()}
+                                        onChange={
+                                            (value) => {
+                                                if(value !== undefined){
+                                                    setToBeDeleted(value);
+                                                    setShow(true);
+                                                    setRemoveValue(null);
+                                                }
+                                            }
+                                        }
                                         placeholder="Select weapon to remove..."
-                                        dropdownGap = {-2}
-                                        dropdownPosition= "auto"
-                                        clearOnSelect={true}
+                                        components = {{
+                                            Option: CustomOption
+                                        }}
+                                        isClearable   
                                     />
                                 </div>
                             </div>
@@ -405,7 +515,7 @@ function Weapons(){
                                 bordered= {false}
                                 filter={ filterFactory() }
                                 noDataIndication={() => (
-                                    <Spinner animation="border" variant="light" />
+                                    loading ? <Spinner animation="border" variant="light" /> : <p>No Data</p>
                                 )}
                                 { ...props.baseProps } />
                         </div>
@@ -416,7 +526,7 @@ function Weapons(){
             </Row>
             
         </Container>
-        <Button variant="primary" className="position-sticky float-right save-button" onClick={() => saveChanged()} disabled={!(weaponData.length > 0)}>
+        <Button variant="primary" className="position-sticky float-right save-button" onClick={() => saveChanged()} disabled={!changed}>
                         Save
             </Button>
         </>

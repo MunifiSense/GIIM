@@ -5,7 +5,7 @@ const UserCharacters = db.UserCharacters;
 const Op = db.Sequelize.Op;
 
 exports.getUserCharacters = (req, res) => {
-    const id = req.params.id;
+    const id = req.id;
     Characters.findAll({
         include: [{
             model: Users,
@@ -29,7 +29,7 @@ exports.getUserCharacters = (req, res) => {
 
 exports.addUserCharacter = (req, res) => {
     // Validate request
-    if (!req.body.userid) {
+    if (!req.id) {
         res.status(400).send({
             message: "Content can not be empty!"
         });
@@ -38,8 +38,19 @@ exports.addUserCharacter = (req, res) => {
 
     // Create UserCharacter
     const userCharacter = {
-        user_id: req.body.userid,
-        character_id: req.body.charid
+        id: req.id,
+        character_id: req.body.charid,
+        level: req.body.level,
+        desired_level: req.body.desired_level,
+        ascended: req.body.ascended,
+        ascend_next_max: req.body.ascend_next_max,
+        managed: req.body.managed,
+        normal_atk_level: req.body.normal_atk_level,
+        normal_atk_desired__level: req.body.normal_atk_desired__level,
+        q_atk_level: req.body.q_atk_level,
+        q_atk_desired_level: req.body.q_atk_desired_level,
+        e_atk_level: req.body.e_atk_level,
+        e_atk_desired_level: req.body.e_atk_desired_level
     };
 
     // Save user chracter
@@ -57,13 +68,13 @@ exports.addUserCharacter = (req, res) => {
 
 exports.updateUserCharacter = (req, res) => {
     // Validate request
-    if (!req.body.userid) {
+    if (!req.id) {
         res.status(400).send({
             message: "Content can not be empty!"
         });
         return;
     }
-    const userid = req.body.userid;
+    const userid = req.id;
     const charid = req.body.charid;
     const userCharacter = {
         level: req.body.level,
@@ -100,8 +111,8 @@ exports.updateUserCharacter = (req, res) => {
 };
 
 exports.removeUserCharacter = (req, res) => {
-    const userid = req.params.id;
-    const charid = req.query.charid
+    const userid = req.id;
+    const charid = req.params.charid
 
     UserCharacters.destroy({where: {
         user_id: userid,

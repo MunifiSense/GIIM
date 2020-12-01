@@ -7,7 +7,18 @@ const UserItems = db.UserItems;
 const Op = db.Sequelize.Op;
 
 exports.getUserItems = (req, res) => {
-    const id = req.params.id;
+    const id = req.id;
+    const userItemCount = UserItems.count({where : {user_id: id}});
+    const itemCount = Items.count();
+    if(userItemCount !== itemCount){
+        this.addUserItems(req,res)
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || "An error occured while add the user's Items."
+            });
+        });
+    }
     Items.findAll({
         include: [{
             model: Users,
@@ -34,7 +45,7 @@ exports.getUserItems = (req, res) => {
 };
 
 exports.addUserItems = (req, res) => {
-    const userid = req.params.id;
+    const userid = req.id;
     console.log(userid);
     Items.findAll()
     .then(data => {
@@ -65,13 +76,13 @@ exports.addUserItems = (req, res) => {
 
 exports.updateUserItem = (req, res) => {
     // Validate request
-    if (!req.body.userid) {
+    if (!req.id) {
         res.status(400).send({
             message: "Content can not be empty!"
         });
         return;
     }
-    const userid = req.body.userid;
+    const userid = req.id;
     const itemid = req.body.itemid;
     const userItem = {
         amount: req.body.amount,
@@ -99,8 +110,8 @@ exports.updateUserItem = (req, res) => {
 };
 
 exports.removeUserItem = (req, res) => {
-    const userid = req.params.id;
-    const itemid = req.query.itemid
+    const userid = req.id;
+    const itemid = req.params.itemid
 
     UserItems.destroy({where: {
         user_id: userid,

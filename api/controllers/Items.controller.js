@@ -1,5 +1,7 @@
 const db = require("../models");
 const Items = db.Items;
+const Domains = db.Domains;
+const Monsters = db.Monsters;
 const Op = db.Sequelize.Op;
 
 exports.getAllItems = (req, res) => {
@@ -17,7 +19,12 @@ exports.getAllItems = (req, res) => {
         where: condition,
         order: [
             ['name', 'ASC']
-        ]})
+        ],
+        include: [{
+            model: Monsters
+        },{
+            model: Domains
+        }]})
         .then(data => {
             res.send(data);
         })
