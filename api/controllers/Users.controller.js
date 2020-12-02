@@ -5,15 +5,15 @@ const Op = db.Sequelize.Op;
 exports.addUser = async (req, res) =>{
     // Create User
     const user= {
-        id: req.id,
+        user_id: req.id,
         email: req.email,
         token: req.token
     };  
 
-    const foundUser = await Users.findOne({where: {id: user.id }});
+    const foundUser = await Users.findOne({where: {user_id: user.user_id }});
     if(foundUser){
         Users.update(user, {
-            where: {id: user.id}
+            where: {user_id: user.user_id}
         }).then(data => {
             res.send(user);
         })

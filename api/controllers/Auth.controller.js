@@ -12,10 +12,16 @@ exports.authenticate = async (req, res, next) => {
         const ticket = await client.verifyIdToken({
             idToken: bearerToken,
             audience: config.client_id
+        })
+        .catch((error) => {
+            console.log(error);
+            res.status(403).send({
+                message:
+                    error.message || "An error occured while authenticating."
+            });
         });
 
         const payload = ticket.getPayload();
-
         console.log(`User ${payload.name} authenticated!`);
         req.email = payload.email;
         req.id = payload.sub;
@@ -23,7 +29,7 @@ exports.authenticate = async (req, res, next) => {
     }else{
         res.status(403).send({
             message:
-                err.message || "An error occured while authenticating."
+                "An error occured while authenticating."
         });
     }
     

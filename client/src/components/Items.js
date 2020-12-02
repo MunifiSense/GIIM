@@ -27,15 +27,35 @@ function Items(){
     const [itemData, setItemData] = useState([]);
     const [changed, setChanged] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    const editableHeader = {
+        backgroundColor: '#303030', 
+        position: 'sticky', 
+        top: '50px', 
+        zIndex: '1', 
+        boxShadow: 'inset 1px 0px white, 0 2px white',
+        height: '100px'
+    };
+
+    const unEditableHeader = {
+        backgroundColor: '#424242', 
+        position: 'sticky', 
+        top: '50px', 
+        zIndex: '1', 
+        boxShadow: '0 2px white',
+        height: '100px'
+    };
+
     const columns = [{
         dataField: `item_id`,
         hidden: true
     },{
         dataField: `game_sort_order`,
-        text: 'Game Sort',
+        text: 'Game\nSort',
         sort: true,
         sortCaret: sortingThing,
-        editable: false
+        editable: false,
+        headerStyle: unEditableHeader
     },{
         dataField: `name`,
         text: `Name`,
@@ -44,25 +64,41 @@ function Items(){
         editable: false,
         formatter: imageFormatter,
         style: {width: '300px'},
-        headerStyle: {width: '300px'}
+        headerStyle: {
+            backgroundColor: '#424242', 
+            position: 'sticky', 
+            top: '50px', 
+            zIndex: '1', 
+            boxShadow: '0 2px white',
+            height: '100px',
+            width: '300px'
+        }
     },{
         dataField: `Users[0].UserItems.amount`,
         text: `Have`,
         sort: true,
         sortCaret: sortingThing,
         style: {backgroundColor: '#303030', borderLeft: '1px solid white', borderRight: '1px solid white'},
-        headerStyle: {backgroundColor: '#303030', borderLeft: '1px solid white', borderRight: '1px solid white'},
+        headerStyle: {backgroundColor: '#303030', position: 'sticky', top: '50px', zIndex: '1', boxShadow: 'inset 1px 0px white, 0 2px white', height: '100px'},
         validator: checkAmountNum
     },{
         dataField: `needed`,
-        text: `Needed Total`,
+        text: `Needed\nTotal`,
         sort: true,
         sortCaret: sortingThing,
         editable: false,
         filter: numberFilter({
             defaultValue: { number: '0', comparator: Comparator.GT },
             placeholder: '#'
-          })
+          }),
+        headerStyle: {
+            backgroundColor: '#424242', 
+            position: 'sticky', 
+            top: '50px', 
+            zIndex: '1', 
+            boxShadow: 'inset 1px 0px white, 0 2px white',
+            height: '100px'
+        }
     },{
         dataField: `Users[0].UserItems.forge`,
         text: `Forge`,
@@ -75,7 +111,7 @@ function Items(){
                 return {borderLeft: '1px solid white', borderRight: '1px solid white'}
             }
         },
-        headerStyle: {backgroundColor: '#303030', borderLeft: '1px solid white', borderRight: '1px solid white'},
+        headerStyle: {backgroundColor: '#303030', position: 'sticky', top: '50px', zIndex: '1', boxShadow: 'inset 1px 0px white, 0 2px white', height: '100px'},
         editable: (cell, row, rowIndex, colIndex) => {
             return cell !== -1;
         },
@@ -86,17 +122,25 @@ function Items(){
         validator: checkForgeNum
     },{
         dataField: `canForge`,
-        text: `Can Forge`,
+        text: `Can\nForge`,
         sort: true,
         sortCaret: sortingThing,
         editable: false,
         formatter: forgeFormatter,
         formatExtraData: {
             '-1': ''
+        },
+        headerStyle: {
+            backgroundColor: '#424242', 
+            position: 'sticky', 
+            top: '50px', 
+            zIndex: '1', 
+            boxShadow: 'inset 1px 0px white, 0 2px white',
+            height: '100px'
         }
     },{
         dataField: `totalAmount`,
-        text: `Total Amount`,
+        text: `Total\nAmount`,
         sort: true,
         sortCaret: sortingThing,
         editable: false,
@@ -104,37 +148,43 @@ function Items(){
             if(cell < 0){
                return {color: 'red'}
             }
-        }
+        },
+        headerStyle: unEditableHeader
     },{
         dataField: `neededCharacterAsc`,
-        text: `Character Ascension`,
+        text: `Character\nAscension`,
         sort: true,
         sortCaret: sortingThing,
-        editable: false
+        editable: false,
+        headerStyle: unEditableHeader
     },{
         dataField: `neededCharacterTalent`,
-        text: `Character Talent`,
+        text: `Character\nTalent`,
         sort: true,
         sortCaret: sortingThing,
-        editable: false
+        editable: false,
+        headerStyle: unEditableHeader
     },{
         dataField: `neededCharacterLevel`,
-        text: `Character Leveling`,
+        text: `Character\nLeveling`,
         sort: true,
         sortCaret: sortingThing,
-        editable: false
+        editable: false,
+        headerStyle: unEditableHeader
     },{
         dataField: `neededWeaponAsc`,
-        text: `Weapon Ascension`,
+        text: `Weapon\nAscension`,
         sort: true,
         sortCaret: sortingThing,
-        editable: false
+        editable: false,
+        headerStyle: unEditableHeader
     },{
         dataField: `neededWeaponLevel`,
-        text: `Weapon Leveling`,
+        text: `Weapon\nLeveling`,
         sort: true,
         sortCaret: sortingThing,
-        editable: false
+        editable: false,
+        headerStyle: unEditableHeader
     }];
 
     const defaultSorted = [{
@@ -342,7 +392,7 @@ function Items(){
             </div>    
         </Row>
         <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
-            <p>Click a cell to edit!</p>
+            <p>Click a dark cell to edit!</p>
         </Row>
         <Container fluid className='table-container'>         
             <Row className="justify-content-md-center">

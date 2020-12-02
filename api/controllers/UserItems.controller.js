@@ -6,18 +6,12 @@ const Monsters = db.Monsters;
 const UserItems = db.UserItems;
 const Op = db.Sequelize.Op;
 
-exports.getUserItems = (req, res) => {
+exports.getUserItems = async (req, res) => {
     const id = req.id;
-    const userItemCount = UserItems.count({where : {user_id: id}});
-    const itemCount = Items.count();
+    const userItemCount = await UserItems.count({where : {user_id: id}});
+    const itemCount = await Items.count();
     if(userItemCount !== itemCount){
-        this.addUserItems(req,res)
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "An error occured while add the user's Items."
-            });
-        });
+        await exports.addUserItems(req,res);
     }
     Items.findAll({
         include: [{
@@ -33,21 +27,21 @@ exports.getUserItems = (req, res) => {
             model: Domains
         }]
     })
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "An error occured while retrieving the user's Items."
-            });
+    .then(data => {
+        res.send(data);
+    })
+    .catch(err => {
+        res.status(500).send({
+            message:
+                err.message || "An error occured while retrieving the user's Items."
         });
+    });
+    
 };
 
-exports.addUserItems = (req, res) => {
+exports.addUserItems = async (req, res) => {
     const userid = req.id;
-    console.log(userid);
-    Items.findAll()
+    return Items.findAll()
     .then(data => {
         var userItems = [];
         data.forEach(element => {
@@ -64,7 +58,10 @@ exports.addUserItems = (req, res) => {
             {
                 fields : ["user_id", "item_id"],
                 updateOnDuplicate: ["user_id"] 
-            });
+            }
+        ).then(() => {
+            return;
+        });
 
         }).catch(err => {
             res.status(500).send({

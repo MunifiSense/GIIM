@@ -38,7 +38,7 @@ exports.addUserCharacter = (req, res) => {
 
     // Create UserCharacter
     const userCharacter = {
-        id: req.id,
+        user_id: req.id,
         character_id: req.body.charid,
         level: req.body.level,
         desired_level: req.body.desired_level,

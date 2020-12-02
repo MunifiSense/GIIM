@@ -71,7 +71,7 @@ function Characters(){
         headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.desired_level`,
-        text: `Desired Level`,
+        text: `Desired\nLevel`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkDesiredLevel,
@@ -95,7 +95,7 @@ function Characters(){
         headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.ascend_next_max`,
-        text: `Ascend On Max?`,
+        text: `Ascend\nOn Max?`,
         editor: {
             type: Type.CHECKBOX,
             value: '1:0'
@@ -111,7 +111,7 @@ function Characters(){
         headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.normal_atk_level`,
-        text: `Normal Attack Level`,
+        text: `Normal\nAttack Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkNTalent,
@@ -119,31 +119,15 @@ function Characters(){
         headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.normal_atk_desired_level`,
-        text: `Normal Attack Desired Level`,
+        text: `Normal\nAttack Desired Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkNDesiredTalent,
         style: {backgroundColor: '#303030'},
         headerStyle: editableHeader
     },{
-        dataField: `Users[0].UserCharacters.q_atk_level`,
-        text: `Q Attack Level`,
-        sort: true,
-        sortCaret: sortingThing,
-        validator: checkQTalent,
-        style: {backgroundColor: '#303030'},
-        headerStyle: editableHeader
-    },{
-        dataField: `Users[0].UserCharacters.q_atk_desired_level`,
-        text: `Q Attack Desired Level`,
-        sort: true,
-        sortCaret: sortingThing,
-        validator: checkQDesiredTalent,
-        style: {backgroundColor: '#303030'},
-        headerStyle: editableHeader
-    },{
         dataField: `Users[0].UserCharacters.e_atk_level`,
-        text: `E Attack Level`,
+        text: `Elemental\nSkill Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkETalent,
@@ -151,10 +135,26 @@ function Characters(){
         headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.e_atk_desired_level`,
-        text: `E Attack Desired Level`,
+        text: `Elemental\nSkill Desired Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkEDesiredTalent,
+        style: {backgroundColor: '#303030'},
+        headerStyle: editableHeader
+    },{
+        dataField: `Users[0].UserCharacters.q_atk_level`,
+        text: `Elemental\nBurst Level`,
+        sort: true,
+        sortCaret: sortingThing,
+        validator: checkQTalent,
+        style: {backgroundColor: '#303030'},
+        headerStyle: editableHeader
+    },{
+        dataField: `Users[0].UserCharacters.q_atk_desired_level`,
+        text: `Elemental\nBurst Desired Level`,
+        sort: true,
+        sortCaret: sortingThing,
+        validator: checkQDesiredTalent,
         style: {backgroundColor: '#303030'},
         headerStyle: editableHeader
     },{
@@ -648,7 +648,7 @@ function Characters(){
             </div>             
         </Row>
         <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
-            <p>Click a cell to edit!</p>
+            <p>Click a dark cell to edit!</p>
         </Row>
         <Container fluid className='table-container'>
             <Modal

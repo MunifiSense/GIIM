@@ -11,6 +11,8 @@ import Navbar from 'react-bootstrap/Navbar';
 import { Switch, Route, Link } from "react-router-dom";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Modal from 'react-bootstrap/Modal';
+import Spinner from 'react-bootstrap/Spinner';
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'react-pro-sidebar/dist/css/styles.css';
@@ -34,83 +36,93 @@ import Container from "react-bootstrap/Container";
 import {userContext} from './userContext';
 
 function App (){
-  const [collapsed, setCollapsed] = React.useState(false);
-  const [menuOpen, setMenuOpen] = React.useState(false);
-  const {user} = useState(getCurrentUser());
+  const [collapsed, setCollapsed] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [user, setUser] = useState(getCurrentUser());
 
-  const loginSuccess = (response) => {
-    console.log(response);
+  const loginSuccess = async (response) => {
     refreshTokenSetup(response);
-    authenticate(response.tokenId).then( () => {
+    authenticate(response.tokenId).then( (response) => {
+      if(response.data.token){
+          localStorage.setItem("user", JSON.stringify(response.data));
+          setUser(response.data);
+      }
       // Check if local x exists
       const localUserCharacters = getLocalUserCharacters();
       const localUserWeapons = getLocalUserWeapons();
       const localUserItems = getLocalUserItems();
-      if(localUserCharacters){
-        localUserCharacters.forEach(element => {
-          const data ={
-            charid: element.character_id,
-            level: element.Users[0].UserCharacters.level,
-            desired_level: element.Users[0].UserCharacters.desired_level,
-            ascended: element.Users[0].UserCharacters.ascended,
-            ascend_next_max: element.Users[0].UserCharacters.ascend_next_max,
-            normal_atk_level: element.Users[0].UserCharacters.normal_atk_level,
-            normal_atk_desired_level: element.Users[0].UserCharacters.normal_atk_desired_level,
-            q_atk_level: element.Users[0].UserCharacters.q_atk_level,
-            q_atk_desired_level: element.Users[0].UserCharacters.q_atk_desired_level,
-            e_atk_level: element.Users[0].UserCharacters.e_atk_level,
-            e_atk_desired_level: element.Users[0].UserCharacters.e_atk_desired_level,
-            managed: element.Users[0].UserCharacters.managed
-          };
-          addUserCharacter(data)
-          .then(response => {
-              
-          })
-          .catch(e => {
-              console.log(e);
+      if(localUserCharacters || localUserWeapons || localUserItems){
+        setShowModal(true);
+        if(localUserCharacters){
+          localUserCharacters.forEach(element => {
+            const data ={
+              charid: element.character_id,
+              level: element.Users[0].UserCharacters.level,
+              desired_level: element.Users[0].UserCharacters.desired_level,
+              ascended: element.Users[0].UserCharacters.ascended,
+              ascend_next_max: element.Users[0].UserCharacters.ascend_next_max,
+              normal_atk_level: element.Users[0].UserCharacters.normal_atk_level,
+              normal_atk_desired_level: element.Users[0].UserCharacters.normal_atk_desired_level,
+              q_atk_level: element.Users[0].UserCharacters.q_atk_level,
+              q_atk_desired_level: element.Users[0].UserCharacters.q_atk_desired_level,
+              e_atk_level: element.Users[0].UserCharacters.e_atk_level,
+              e_atk_desired_level: element.Users[0].UserCharacters.e_atk_desired_level,
+              managed: element.Users[0].UserCharacters.managed
+            };
+            addUserCharacter(data)
+            .then(response => {
+                
+            })
+            .catch(e => {
+                console.log(e);
+            });
           });
-        });
-        localStorage.removeItem("userCharacters");
-      } 
-
-      if(localUserWeapons){
-        localUserWeapons.forEach(element => {
-          const data ={
-            weaponid: element.weapon_id,
-            level: element.Users[0].UserWeapons.level,
-            desired_level: element.Users[0].UserWeapons.desired_level,
-            ascended: element.Users[0].UserWeapons.ascended,
-            ascend_next_max: element.Users[0].UserWeapons.ascend_next_max,
-            managed: element.Users[0].UserWeapons.managed
-          };
-          addUserWeapon(data)
-          .then(response => {
-              
-          })
-          .catch(e => {
-              console.log(e);
+          localStorage.removeItem("userCharacters");
+        } 
+  
+        if(localUserWeapons){
+          localUserWeapons.forEach(element => {
+            const data ={
+              weaponid: element.weapon_id,
+              level: element.Users[0].UserWeapons.level,
+              desired_level: element.Users[0].UserWeapons.desired_level,
+              ascended: element.Users[0].UserWeapons.ascended,
+              ascend_next_max: element.Users[0].UserWeapons.ascend_next_max,
+              managed: element.Users[0].UserWeapons.managed
+            };
+            addUserWeapon(data)
+            .then(response => {
+                
+            })
+            .catch(e => {
+                console.log(e);
+            });
           });
-        });
-        localStorage.removeItem("userWeapons");
-      }
-
-      if(localUserItems){
-        localUserItems.forEach(element => {
-          const data ={
-            itemid: element.item_id,
-            amount: element.Users[0].UserItems.amount.amount,
-            forge: element.Users[0].UserItems.amount.forge
-          };
-          updateUserItem(data)
-          .then(response => {
-              
-          })
-          .catch(e => {
-              console.log(e);
+          localStorage.removeItem("userWeapons");
+        }
+  
+        if(localUserItems){
+          localUserItems.forEach(element => {
+            const data ={
+              itemid: element.item_id,
+              amount: element.Users[0].UserItems.amount.amount,
+              forge: element.Users[0].UserItems.amount.forge
+            };
+            updateUserItem(data)
+            .then(response => {
+                
+            })
+            .catch(e => {
+                console.log(e);
+            });
           });
-        });
-        localStorage.removeItem("userItems");
-      }
+          localStorage.removeItem("userItems");
+        }
+        setShowModal(false);
+      }   
+    }).catch(error => {
+      console.log(error);
     });
   }
 
@@ -121,11 +133,31 @@ function App (){
   const logout = () => {
     //logout
     authlogout();
+    setUser();
   }
 
   return(
-    <div className="page-content">
+    <div className="page-content">      
         <IconContext.Provider value={{className : 'react-icons'}}>
+          <Modal
+                  show={showModal}
+                  backdrop="static"
+                  keyboard={false}
+                  aria-labelledby="contained-modal-title-vcenter"
+                  centered
+                  size="lg"
+              >
+                  <Modal.Header>
+                      <Modal.Title id="contained-modal-title-vcenter">
+                          Uploading Local Data
+                      </Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                      GIM is currently uploading your local data to the database. <break></break>
+                      Please wait...
+                      <Spinner animation="border" variant="light" />
+                  </Modal.Body>
+          </Modal>
             <Navbar variant="dark" fixed="top" className='navbar'>
                 <Button variant="dark" onMouseDown={e => e.preventDefault()} onClick={() => setMenuOpen(!menuOpen)} className="nav-btn">
                   <FaBars />
@@ -154,6 +186,7 @@ function App (){
                       onFailure={loginFail}
                       cookiePolicy={'single_host_origin'}
                       theme={'dark'}
+                      isSingedIn={true}
                   /> : 
                   <GoogleLogout
                     clientId="871403107294-7if7ber7cm2po4t5nnrvvdogpsp09t0l.apps.googleusercontent.com"
@@ -230,12 +263,12 @@ function App (){
                 </Col>
                 <Col md={{ span: 3, offset: 2 }} style={{marginTop: '20px'}}>
                     <p><b>Links</b></p>              
-                    <a href="url">Contact</a>
+                    <a href="mailto:GenshinItemManager@outlook.com">Contact</a>
                 </Col>
                 <Col md={{ span: 3}} style={{marginTop: '20px'}}>
-                    <p><b>Community Links</b></p>
-                    <a href="url">Discord</a><br></br>
-                    <a href="url">Twitter</a>
+                    <p><b>Social Links</b></p>
+                    <a href="https://discordapp.com/users/Muni#4321">Discord</a><br></br>
+                    <a href="https://twitter.com/MunifiS">Twitter</a>
                 </Col>
               </Row>
             </Container>

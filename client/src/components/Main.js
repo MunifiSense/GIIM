@@ -21,9 +21,14 @@ function Home(){
                 <Card.Body style={{overflowY: 'auto'}}>
                   <Card.Title><b>Welcome to Genshin Item Manager!</b></Card.Title>
                   <Card.Text>
-                  This is a site for managing your Genshin Impact items! You can set your characters or weapons and find out exactly how many of each item you need to collect.<br></br>
+                  This is a site for managing your Genshin Impact items! You can set your characters or weapons and find out exactly how many of each item you need to collect.
+                  <br></br>
                   <br></br>  
                   Click the menu bar on the top left to access the important stuff.
+                  <br></br>
+                  <br></br>    
+                  If you want to contact me about any problems with the website or have any suggestions for me, you can visit the <a href="/suggestions">Suggestions</a> page, 
+                  or you can DM me on Discord at <a href="https://discordapp.com/users/Muni#4321">Muni#4321</a>!
                   </Card.Text>
                 </Card.Body>
               </Card>

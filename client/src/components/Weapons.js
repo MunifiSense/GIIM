@@ -34,10 +34,21 @@ function Weapons(){
     const [addValue, setAddValue] = useState();
     const [removeValue, setRemoveValue] = useState();
     const [loading, setLoading] = useState(true);
+
     const selectOptions = {
         0: '-',
         1: '✓'
     };
+
+    const editableHeader = {
+        backgroundColor: '#303030', 
+        position: 'sticky', 
+        top: '50px', 
+        zIndex: '1', 
+        boxShadow: 'inset 1px 0px white, 0 2px white',
+        height: '100px'
+    };
+
     const columns = [{
         dataField: `weapon_id`,
         hidden: true
@@ -49,7 +60,7 @@ function Weapons(){
         editable: false,
         formatter: imageFormatter,
         style: {borderRight: '1px solid white', width: '300px'},
-        headerStyle: {borderRight: '1px solid white', width: '300px'}
+        headerStyle: {backgroundColor: '#424242', borderRight: '1px solid white', width: '300px', position: 'sticky', top: '50px', zIndex: '1', boxShadow: '1px 0px white, 0 2px white'}
     },{
         dataField: `Users[0].UserWeapons.level`,
         text: `Level`,
@@ -57,7 +68,7 @@ function Weapons(){
         sortCaret: sortingThing,
         validator: checkLevel,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserWeapons.desired_level`,
         text: `Desired Level`,
@@ -65,7 +76,7 @@ function Weapons(){
         sortCaret: sortingThing,
         validator: checkDesiredLevel,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserWeapons.ascended`,
         text: `Ascended`,
@@ -81,7 +92,7 @@ function Weapons(){
         sort: true,
         sortCaret: sortingThing,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserWeapons.ascend_next_max`,
         text: `Ascend On Max?`,
@@ -97,7 +108,7 @@ function Weapons(){
         sort: true,
         sortCaret: sortingThing,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'}
+        headerStyle: editableHeader
     },{
         dataField: `Users[0].UserWeapons.managed`,
         text: `Managed`,
@@ -112,7 +123,7 @@ function Weapons(){
         },
         sort: true,
         style: {backgroundColor: '#303030'},
-        headerStyle: {backgroundColor: '#303030'},
+        headerStyle: editableHeader,
         sortCaret: sortingThing,
         filter: selectFilter({
             options: selectOptions,
@@ -402,7 +413,7 @@ function Weapons(){
             </div>   
         </Row>
         <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
-                <p>Click a cell to edit!</p>
+                <p>Click a dark cell to edit!</p>
         </Row>
         <Container fluid className='table-container'>
             <Modal
