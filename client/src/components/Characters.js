@@ -6,6 +6,9 @@ import Row from 'react-bootstrap/Row';
 import Modal from 'react-bootstrap/Modal';
 import Image from 'react-bootstrap/Image';
 import Spinner from 'react-bootstrap/Spinner';
+import Card from 'react-bootstrap/Card';
+import Col from 'react-bootstrap/Col';
+import Form from 'react-bootstrap/Form';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import BootstrapTable from 'react-bootstrap-table-next';
 import { Type } from 'react-bootstrap-table2-editor';
@@ -15,10 +18,11 @@ import {FaSortUp, FaSortDown} from 'react-icons/fa';
 import filterFactory, { selectFilter } from 'react-bootstrap-table2-filter';
 import Select from 'react-select';
 import { BsFillPeopleFill } from 'react-icons/bs';
+import {getRarityFrame, getRarityGradient, getRarityStars, getItemImage} from '../tools/misc';
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { userContext } from "../userContext";
-import {cloneDeep, indexOf} from "lodash";
+import {cloneDeep} from "lodash";
 const set = require('set-value');
 const { SearchBar } = Search;
 
@@ -29,11 +33,15 @@ function Characters(){
     const [characterData, setCharacterData] = useState([]);
     const [changed, setChanged] = useState(false);
     const [show, setShow] = useState(false);
-    const [toBeDeleted, setToBeDeleted] = useState({});
+    const [showAdd, setShowAdd] = useState(false);
+    const [toBeAdded, setToBeAdded] = useState(null);
+    const [toBeAddedData, setToBeAddedData] = useState({});
+    const [toBeDeleted, setToBeDeleted] = useState(null);
     const [addValue, setAddValue] = useState();
     const [removeValue, setRemoveValue] = useState();
     const [loading, setLoading] = useState(true);
     const handleClose = () => setShow(false);
+    const handleCloseAdd = () => setShowAdd(false);
 
     const selectOptions = {
         0: '-',
@@ -126,24 +134,8 @@ function Characters(){
         style: {backgroundColor: '#303030'},
         headerStyle: editableHeader
     },{
-        dataField: `Users[0].UserCharacters.q_atk_level`,
-        text: `Q Attack Level`,
-        sort: true,
-        sortCaret: sortingThing,
-        validator: checkQTalent,
-        style: {backgroundColor: '#303030'},
-        headerStyle: editableHeader
-    },{
-        dataField: `Users[0].UserCharacters.q_atk_desired_level`,
-        text: `Q Attack Desired Level`,
-        sort: true,
-        sortCaret: sortingThing,
-        validator: checkQDesiredTalent,
-        style: {backgroundColor: '#303030'},
-        headerStyle: editableHeader
-    },{
         dataField: `Users[0].UserCharacters.e_atk_level`,
-        text: `E Attack Level`,
+        text: `Elemental Skill Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkETalent,
@@ -151,10 +143,26 @@ function Characters(){
         headerStyle: editableHeader
     },{
         dataField: `Users[0].UserCharacters.e_atk_desired_level`,
-        text: `E Attack Desired Level`,
+        text: `Elemental Skill Desired Level`,
         sort: true,
         sortCaret: sortingThing,
         validator: checkEDesiredTalent,
+        style: {backgroundColor: '#303030'},
+        headerStyle: editableHeader
+    },{
+        dataField: `Users[0].UserCharacters.q_atk_level`,
+        text: `Elemental Burst Level`,
+        sort: true,
+        sortCaret: sortingThing,
+        validator: checkQTalent,
+        style: {backgroundColor: '#303030'},
+        headerStyle: editableHeader
+    },{
+        dataField: `Users[0].UserCharacters.q_atk_desired_level`,
+        text: `Elemental Burst Desired Level`,
+        sort: true,
+        sortCaret: sortingThing,
+        validator: checkQDesiredTalent,
         style: {backgroundColor: '#303030'},
         headerStyle: editableHeader
     },{
@@ -528,8 +536,6 @@ function Characters(){
             });
         }else{
             const indexOfChar = userCharacters.findIndex((chara) => chara.character_id === value.character_id);
-            console.log(value);
-            console.log(indexOfChar);
             const newUserChar = userCharacters[indexOfChar];
             set(newUserChar.Users[0], 'UserCharacters.level', value.level);
             set(newUserChar.Users[0], 'UserCharacters.desired_level', value.desired_level);
@@ -639,6 +645,145 @@ function Characters(){
         setCharacterData([]);
     }
 
+    function addCharStuff(){
+        setToBeAddedData({
+            level: 1,
+            desired_level: 1,
+            normal_atk_level: 1,
+            normal_atk_desired_level: 1,
+            e_atk_level: 1,
+            e_atk_desired_level: 1,
+            q_atk_level: 1,
+            q_atk_desired_level: 1
+        });
+        const charIndex = characters.findIndex((element) => element.character_id === toBeAdded.character_id);
+        const item = characters[charIndex];
+        const character = item.name;
+        return(
+            <>
+               <Card className='sum-card' key={character+ '1'} style={{width: '300px'}}>
+                    <div style={getRarityGradient(item.rarity)}>
+                        <div className='sum-card-div' style={{position: 'relative', display: 'inline-block', marginRight: '5px'}}>
+                            {getRarityStars(item.rarity)}
+                            <div>
+                                <Image src={getItemImage('Character', character)} style={{maxWidth: '64px', maxHeight: '64px', marginLeft: 'auto', marginRight: 'auto', marginTop: '5px', marginBottom: '5px'}}/>
+                                <Image src={getItemImage('Element', item.element)} roundedCircle className='overlay-top' style={{width: '20px'}}/>        
+                            </div>                                                      
+                        </div>
+                    </div>  
+                    <Card.Header key={character  + '2'} style={getRarityFrame(item.rarity)}>                                       
+                        <h4 className='genshin-font' style={{paddingTop: '2px'}}>{character}</h4>
+                    </Card.Header>
+                    <Card.Body>
+                    <div key={character  + '3'}>
+                        <Form>
+                            <Card className="sum-inner-card text-center">
+                                <Card.Header>
+                                    <b>Level</b>
+                                </Card.Header>
+                                <Card.Body>
+                                    <Row className="justify-content-md-between">
+                                        <Col>
+                                            <Form.Group controlId="formGroupLevel">
+                                                <Form.Label>Level</Form.Label>
+                                                <Form.Control type="text" placeholder="Enter Level" />
+                                            </Form.Group>
+                                        </Col>                                                          
+                                        <Col>
+                                            <Form.Group controlId="formGroupDesiredLevel">
+                                                <Form.Label>Desired Level</Form.Label>
+                                                <Form.Control type="text" placeholder="Enter Desired Level" />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>    
+                                </Card.Body>
+                            </Card>  
+                            <Card className="sum-inner-card text-center">
+                                <Card.Header>
+                                    <b>Talents</b>
+                                </Card.Header>
+                                <Card.Body>
+                                    <Row className="justify-content-md-between">
+                                        <Col>
+                                            <Form.Group controlId="formGroupNormalLevel">
+                                                <Form.Label>Normal Attack Level</Form.Label>
+                                                <Form.Control type="text" placeholder="Enter Normal Attack Level" />
+                                            </Form.Group>
+                                        </Col>                                                          
+                                        <Col>
+                                            <Form.Group controlId="formGroupDesiredNormalLevel">
+                                                <Form.Label>Desired Normal Attack Level</Form.Label>
+                                                <Form.Control type="text" placeholder="Enter Desired Normal Attack Level" />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                    <Row className="justify-content-md-between">
+                                        <Col>
+                                            <Form.Group controlId="formGroupSkillLevel">
+                                                <Form.Label>Normal Attack Level</Form.Label>
+                                                <Form.Control type="text" placeholder="Enter Elemental Skill Level" />
+                                            </Form.Group>
+                                        </Col>                                                          
+                                        <Col>
+                                            <Form.Group controlId="formGroupDesiredSkillLevel">
+                                                <Form.Label>Desired Normal Attack Level</Form.Label>
+                                                <Form.Control type="text" placeholder="Enter Desired Elemental Skill Level" />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row> 
+                                    <Row className="justify-content-md-between">
+                                        <Col>
+                                            <Form.Group controlId="formGroupBurstLevel">
+                                                <Form.Label>Normal Attack Level</Form.Label>
+                                                <Form.Control type="text" placeholder="Enter Elemental Burst Level" />
+                                            </Form.Group>
+                                        </Col>                                                          
+                                        <Col>
+                                            <Form.Group controlId="formGroupDesiredBurstLevel">
+                                                <Form.Label>Desired Normal Attack Level</Form.Label>
+                                                <Form.Control type="text" placeholder="Enter Desired Elemental Burst Level" />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>  
+                                </Card.Body>
+                            </Card>
+                            <Card className="sum-inner-card text-center">
+                                <Card.Header>
+                                    <b>Ascension</b>
+                                </Card.Header>
+                                <Card.Body>
+                                    <Row className="justify-content-md-between">
+                                        <Col>
+                                            <Form.Group controlId="formGroupAscended">
+                                                <Form.Label>Ascended?</Form.Label>
+                                                <Form.Check 
+                                                    type="switch"
+                                                    id="ascend-switch"
+                                                    label="Ascended?"
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col>
+                                            <Form.Group controlId="formGroupAscended">
+                                                <Form.Label>Ascend on Max?</Form.Label>
+                                                <Form.Check 
+                                                    type="switch"
+                                                    id="ascend-max-switch"
+                                                    label="Ascend on Max?"
+                                                />
+                                            </Form.Group>
+                                        </Col>                                      
+                                    </Row>     
+                                </Card.Body>
+                            </Card>
+                        </Form>
+                    </div>
+                    </Card.Body> 
+                </Card>
+            </>
+        );
+    }
+
     return(
         <>
         <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
@@ -651,6 +796,36 @@ function Characters(){
             <p>Click a cell to edit!</p>
         </Row>
         <Container fluid className='table-container'>
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+                size="lg"
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Adding Character
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {toBeAdded ? addCharStuff() : ''}
+                </Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Cancel
+                </Button>
+                <Button variant="primary" onClick={() => {
+                    handleClose();
+                    AddUserCharacter(toBeAdded.value);
+                }             
+                    }>
+                    Add
+                </Button>
+                </Modal.Footer>
+            </Modal>
             <Modal
                 show={show}
                 onHide={handleClose}
