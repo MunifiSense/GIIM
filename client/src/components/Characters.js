@@ -18,7 +18,7 @@ import { BsFillPeopleFill } from 'react-icons/bs';
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { userContext } from "../userContext";
-import {cloneDeep, indexOf} from "lodash";
+import {cloneDeep} from "lodash";
 const set = require('set-value');
 const { SearchBar } = Search;
 
@@ -429,11 +429,12 @@ function Characters(){
     }
 
     useEffect(() =>{
+        setLoading(true);
         retrieveCharactersInfo();
         retrieveUserCharacters();
         setLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user]);
 
     function retrieveCharactersInfo(){
         getAllCharacters().then(response => {
@@ -454,9 +455,10 @@ function Characters(){
             });
         }else{
             // If not signed in and no userCharacters stored locally...
-            var localUserCharData = localStorage.getItem("userCharacters");
+            const localUserCharData = localStorage.getItem("userCharacters");
             if(!localUserCharData){
                 localStorage.setItem("userCharacters", JSON.stringify([]));
+                setUserCharacters([]);
             }else{
                 setUserCharacters(JSON.parse(localUserCharData));
             }
@@ -746,7 +748,7 @@ function Characters(){
                                     mode: 'click',
                                     blurToSave: true,
                                     afterSaveCell: (oldValue, newValue, row, column) => {
-                                        var indexOfChar = characterData.findIndex(userChar => userChar.character_id === row.Users[0].UserCharacters.character_id);
+                                        const indexOfChar = characterData.findIndex(userChar => userChar.character_id === row.Users[0].UserCharacters.character_id);
                                         if(indexOfChar !== -1){
                                             characterData[indexOfChar] = row.Users[0].UserCharacters;
                                         }else{

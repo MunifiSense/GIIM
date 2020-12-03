@@ -1,7 +1,7 @@
 import {getUserCharacters} from "../services/CharacterService";
 import {getUserWeapons} from "../services/WeaponService";
 import {getUserItems} from "../services/ItemService";
-import { GiConsoleController } from "react-icons/gi";
+
 const xpToNextLevel = [
     0,
     1000,

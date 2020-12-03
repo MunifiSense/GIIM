@@ -44,7 +44,7 @@ function Items(){
             setLoading(false);
         }) ();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user]);
 
     /*async function retrieveStuff(){
         //setItems(await retrieveItemsInfo());
@@ -502,7 +502,7 @@ function Items(){
                             {Object.keys(userItems).map((item, i) => {
                                 var itemName = userItems[item].name;
                                 if(Number(userItems[item].item_id) === 1){
-                                    return;
+                                    return <></>;
                                 }                  
                                 return (
                                     <Fragment key={itemName}>

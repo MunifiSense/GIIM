@@ -5,7 +5,8 @@ const cors = require("cors");
 const app = express();
 
 var corsOptions = {
-  origin: "http://localhost:8081"
+  origin: "http://genshinitemmanager.muni.moe",
+  optionsSuccessStatus: 200 
 };
 
 app.use(cors(corsOptions));
@@ -20,7 +21,7 @@ const db = require("./models");
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to the GIMM DB." });
+  res.json({ message: `Welcome to the GIMM DB.`});
 });
 
 require("./routes/Characters.routes")(app);
@@ -32,7 +33,7 @@ require("./routes/UserItems.routes")(app);
 require("./routes/Auth.routes")(app);
 
 // set port, listen for requests
-const PORT = process.env.PORT || 9000;
+const PORT = process.env.PORT || 2086;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });

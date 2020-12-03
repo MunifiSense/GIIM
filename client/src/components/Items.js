@@ -12,7 +12,7 @@ import cellEditFactory from 'react-bootstrap-table2-editor';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import {FaSortUp, FaSortDown} from 'react-icons/fa';
 import filterFactory, { numberFilter, Comparator } from 'react-bootstrap-table2-filter';
-import { GiConsoleController, GiSwapBag } from 'react-icons/gi';
+import {GiSwapBag} from 'react-icons/gi';
 import "../App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { userContext } from "../userContext";
@@ -27,15 +27,6 @@ function Items(){
     const [itemData, setItemData] = useState([]);
     const [changed, setChanged] = useState(false);
     const [loading, setLoading] = useState(true);
-
-    const editableHeader = {
-        backgroundColor: '#303030', 
-        position: 'sticky', 
-        top: '50px', 
-        zIndex: '1', 
-        boxShadow: 'inset 1px 0px white, 0 2px white',
-        height: '100px'
-    };
 
     const unEditableHeader = {
         backgroundColor: '#424242', 
@@ -219,12 +210,13 @@ function Items(){
 
     useEffect(() =>{
         (async function retrieveStuff() {
+            setLoading(true);
             setItems(await retrieveItemsInfo());
             setUserItems(await retrieveNeeded(user, await retrieveUserItems()));
             setLoading(false);
         }) ();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user]);
 
     function forgeFormatter(cell, row, rowIndex, formatExtraData) {
         if(cell !== -1){
@@ -261,11 +253,10 @@ function Items(){
                 });
             }else{
                 // If not signed in and no userItems stored locally...
-                var localUserItemData = JSON.parse(localStorage.getItem("userItems"));
+                const localUserItemData = JSON.parse(localStorage.getItem("userItems"));
                 if(!localUserItemData || localUserItemData.length === 0){
                     const newUserItems = [];
                     items.forEach(element => {
-                        console.log("aaa");
                         const newUserItem = element;
                         newUserItem.Users = [];
                         newUserItem.Users[0]= {};
@@ -273,7 +264,7 @@ function Items(){
                         set(newUserItem.Users[0], 'UserItems.forge', 0);
                         newUserItems.push(newUserItem);               
                     }) 
-                    setUserItems(newUserItems);     
+                    //setUserItems(newUserItems);     
                     localStorage.setItem("userItems", JSON.stringify(newUserItems));
                     resolve(newUserItems);
                 }else{
@@ -320,25 +311,6 @@ function Items(){
         
         return true;
     }
-
-    function AddUserItems(){
-        if(user){
-            
-        }else{
-            const newUserItems = cloneDeep(userItems);
-            items.forEach(element => {
-                const newUserItem = element;
-                newUserItem.Users = [];
-                newUserItem.Users[0]= {};
-                set(newUserItem.Users[0], 'UserItems.item_id', element.item_id);
-                set(newUserItem.Users[0], 'UserItems.amount', 0);
-                set(newUserItem.Users[0], 'UserItems.forge', 0);
-                newUserItems.push(newUserItem);               
-            }) 
-            setUserItems(newUserItems);     
-            localStorage.setItem("userItems", JSON.stringify(newUserItems));
-        }     
-    };
 
     function UpdateUserItem(value){
         if(user){
@@ -415,7 +387,7 @@ function Items(){
                                     mode: 'click',
                                     blurToSave: true,
                                     afterSaveCell: (oldValue, newValue, row, column) => {
-                                        var indexOfItem = itemData.findIndex(userItem => userItem.item_id === row.Users[0].UserItems.item_id);
+                                        const indexOfItem = itemData.findIndex(userItem => userItem.item_id === row.Users[0].UserItems.item_id);
                                         if(indexOfItem !== -1){
                                             itemData[indexOfItem] = row.Users[0].UserItems;
                                         }else{

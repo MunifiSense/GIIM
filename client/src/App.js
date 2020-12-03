@@ -18,7 +18,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import 'react-pro-sidebar/dist/css/styles.css';
 import "./App.css";
 import {refreshTokenSetup} from './tools/refreshToken';
-import {authenticate, authlogout, getCurrentUser} from './services/AuthService';
+import {authenticate, authlogout} from './services/AuthService';
 import {getLocalUserCharacters, addUserCharacter} from './services/CharacterService';
 import {getLocalUserWeapons, addUserWeapon} from './services/WeaponService';
 import {getLocalUserItems, updateUserItem} from './services/ItemService';
@@ -39,10 +39,10 @@ function App (){
   const [collapsed, setCollapsed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [user, setUser] = useState(getCurrentUser());
+  const [user, setUser] = useState();
 
   const loginSuccess = async (response) => {
-    refreshTokenSetup(response);
+    await refreshTokenSetup(response);
     authenticate(response.tokenId).then( (response) => {
       if(response.data.token){
           localStorage.setItem("user", JSON.stringify(response.data));
@@ -133,7 +133,7 @@ function App (){
   const logout = () => {
     //logout
     authlogout();
-    setUser();
+    setUser(undefined);
   }
 
   return(
@@ -153,7 +153,7 @@ function App (){
                       </Modal.Title>
                   </Modal.Header>
                   <Modal.Body>
-                      GIM is currently uploading your local data to the database. <break></break>
+                      GIM is currently uploading your local data to the database. <br></br>
                       Please wait...
                       <Spinner animation="border" variant="light" />
                   </Modal.Body>
@@ -186,7 +186,7 @@ function App (){
                       onFailure={loginFail}
                       cookiePolicy={'single_host_origin'}
                       theme={'dark'}
-                      isSingedIn={true}
+                      isSignedIn={true}
                   /> : 
                   <GoogleLogout
                     clientId="871403107294-7if7ber7cm2po4t5nnrvvdogpsp09t0l.apps.googleusercontent.com"

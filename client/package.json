@@ -1,5 +1,6 @@
 {
   "name": "react-crud",
+  "homepage": "http://genshinitemmanager.muni.moe/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

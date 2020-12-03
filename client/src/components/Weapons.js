@@ -217,11 +217,12 @@ function Weapons(){
     }
 
     useEffect(() =>{
+        setLoading(true);
         retrieveWeaponsInfo();
         retrieveUserWeapons();
         setLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user]);
 
     function retrieveWeaponsInfo(){
         getAllWeapons().then(response => {
@@ -245,6 +246,7 @@ function Weapons(){
             var localUserWeaponData = localStorage.getItem("userWeapons");
             if(!localUserWeaponData){
                 localStorage.setItem("userWeapons", JSON.stringify([]));
+                setUserWeapons([]);
             }else{
                 setUserWeapons(JSON.parse(localUserWeaponData));
             }
