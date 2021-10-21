@@ -20,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
         model: 'Weapons',
         key: 'weapon_id'
       },
-      unique: "FK_UserWeapons_munimoe_GIIM.Weapons",
+      unique: "FK_UserWeapons_DBNAME_GIIM.Weapons",
       primaryKey: true
     },
     level: {

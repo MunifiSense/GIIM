@@ -107,15 +107,15 @@ function Items(){
 
     function getItemImage(type, itemName) {
         if(type === 'Character'){
-            return('https://muni.moe/images/genshin/Character_'+itemName+'_Thumb.png');
+            return('https://localhost/images/genshin/Character_'+itemName+'_Thumb.png');
         }else if (type === 'Weapon'){
-            return('https://muni.moe/images/genshin/Weapon_'+itemName.replace(/ /g, '_').replace(/'/g,'%27')+'.png');
+            return('https://localhost/images/genshin/Weapon_'+itemName.replace(/ /g, '_').replace(/'/g,'%27')+'.png');
         } else if (type === 'Item'){
-            return('https://muni.moe/images/genshin/Item_'+itemName.replace(/ /g, '_').replace(/'/g,'%27')+'.png');
+            return('https://localhost/images/genshin/Item_'+itemName.replace(/ /g, '_').replace(/'/g,'%27')+'.png');
         } else if (type === 'Monster'){
-            return('https://muni.moe/images/genshin/Enemy_'+itemName.replace(/ /g, '_').replace(/'/g,'%27')+'.png');
+            return('https://localhost/images/genshin/Enemy_'+itemName.replace(/ /g, '_').replace(/'/g,'%27')+'.png');
         } else{
-            return('https://muni.moe/images/genshin/'+ type +'_'+itemName.replace(/ /g, '_').replace(/'/g,'%27')+'.png');
+            return('https://localhost/images/genshin/'+ type +'_'+itemName.replace(/ /g, '_').replace(/'/g,'%27')+'.png');
         }
     }
 

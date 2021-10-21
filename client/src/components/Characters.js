@@ -588,7 +588,7 @@ function Characters(){
     function imageFormatter(cell, row, rowIndex, formatExtraData) {
         return(
         <span>
-            <Image src={'https://muni.moe/images/genshin/Character_'+cell+'_Thumb.png'} style={{height: '64px', width: '64px', marginRight: "10px", display: 'inline-block', verticalAlign: 'middle'}}/>
+            <Image src={'https://localhost/images/genshin/Character_'+cell+'_Thumb.png'} style={{height: '64px', width: '64px', marginRight: "10px", display: 'inline-block', verticalAlign: 'middle'}}/>
             <p style={{display: 'inline-block'}}>{cell}</p>
             
         </span>
@@ -601,7 +601,7 @@ function Characters(){
             newAddUsers.push({
                 value: element.character_id,
                 label: element.name,
-                image: 'https://muni.moe/images/genshin/Character_'+ element.name +'_Thumb.png'
+                image: 'https://localhost/images/genshin/Character_'+ element.name +'_Thumb.png'
             });
         });
         newAddUsers.sort((a, b) => {
@@ -616,7 +616,7 @@ function Characters(){
             newRemoveUsers.push({
                 value: element.character_id,
                 label: element.name,
-                image: 'https://muni.moe/images/genshin/Character_'+ element.name +'_Thumb.png'
+                image: 'https://localhost/images/genshin/Character_'+ element.name +'_Thumb.png'
             });
         });
         newRemoveUsers.sort((a, b) => {

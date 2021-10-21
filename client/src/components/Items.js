@@ -334,7 +334,7 @@ function Items(){
     function imageFormatter(cell, row, rowIndex, formatExtraData) {
         return(
         <span>
-            <Image src={'https://muni.moe/images/genshin/Item_'+cell.replace(/ /g, '_').replace(/'/g,'%27')+'.png'} style={{height: '32px', width: '32px', marginRight: "10px", display: 'inline-block', verticalAlign: 'middle'}}/>
+            <Image src={'https://localhost/images/genshin/Item_'+cell.replace(/ /g, '_').replace(/'/g,'%27')+'.png'} style={{height: '32px', width: '32px', marginRight: "10px", display: 'inline-block', verticalAlign: 'middle'}}/>
             <p style={{display: 'inline-block'}}>{cell}</p>
             
         </span>

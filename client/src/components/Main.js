@@ -31,7 +31,7 @@ function Home(){
                   <br></br>
                   <br></br>        
                   If you want to contact me about any problems with the website or have any suggestions for me, you can visit the <a href="/suggestions">Suggestions</a> page, 
-                  or you can DM me on Discord at <a href="https://discordapp.com/users/Muni#4321">Muni#4321</a>!
+                  or you can DM me on Discord at <a href="https://discordapp.com/"></a>!
                   </Card.Text>
                 </Card.Body>
               </Card>
