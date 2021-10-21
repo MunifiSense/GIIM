@@ -22,13 +22,13 @@ The project uses:
 * Sequelize
 * MariaDB
 
-The API can be called with: <br/>
+The API endpoints are: <br/>
 http://SERVERURL/api/characters/characterName <br/>
 http://SERVERURL/api/weapons/weaponName <br/>
 http://SERVERURL/api/items/itemName <br/>
 
-These calls need authorization: <br/>
+These endpoints need authorization: <br/>
 http://SERVERURL/api/auth <br/>
-http://SERVERURL/api/usercharacters/userID <br/>
-http://SERVERURL/api/userweapons/userID <br/>
-http://SERVERURL/api/useritems/userID <br/>
+http://SERVERURL/api/usercharacters/charID <br/>
+http://SERVERURL/api/userweapons/weaponID <br/>
+http://SERVERURL/api/useritems/ <br/>
