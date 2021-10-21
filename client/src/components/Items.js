@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext  } from "react";
 import {getAllItems, getUserItems, updateUserItem} from "../services/ItemService";
-import {retrieveNeeded, checkForge} from "../tools/ItemCalc";
+import {retrieveNeeded} from "../tools/ItemCalc";
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
@@ -22,7 +22,6 @@ const { SearchBar } = Search;
 
 function Items(){
     const user = useContext(userContext);
-    const [items, setItems] = useState([]);
     const [userItems, setUserItems] = useState([]);
     const [itemData, setItemData] = useState([]);
     const [changed, setChanged] = useState(false);
@@ -34,7 +33,8 @@ function Items(){
         top: '50px', 
         zIndex: '1', 
         boxShadow: '0 2px white',
-        height: '100px'
+        height: '100px',
+        width: '100px'
     };
 
     const columns = [{
@@ -74,7 +74,7 @@ function Items(){
         validator: checkAmountNum
     },{
         dataField: `needed`,
-        text: `Needed\nTotal`,
+        text: `Needed`,
         sort: true,
         sortCaret: sortingThing,
         editable: false,
@@ -131,13 +131,15 @@ function Items(){
         }
     },{
         dataField: `totalAmount`,
-        text: `Total\nAmount`,
+        text: `Total\nSum`,
         sort: true,
         sortCaret: sortingThing,
         editable: false,
         style: (cell, row, rowIndex, colIndex) => {
             if(cell < 0){
-               return {color: 'red'}
+                return {color: 'red'}
+            } else if(cell > 0){
+                return {color: 'green'}
             }
         },
         headerStyle: unEditableHeader
@@ -209,12 +211,7 @@ function Items(){
     }
 
     useEffect(() =>{
-        (async function retrieveStuff() {
-            setLoading(true);
-            setItems(await retrieveItemsInfo());
-            setUserItems(await retrieveNeeded(user, await retrieveUserItems()));
-            setLoading(false);
-        }) ();
+        retrieveStuff();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
@@ -227,23 +224,14 @@ function Items(){
         )
     }
 
-    /*async function retrieveStuff(){
-        setItems(await retrieveItemsInfo());
-        setUserItems(await retrieveNeeded(await retrieveUserItems()));
+    async function retrieveStuff() {
+        setLoading(true);
+        const retrievedItems = await getAllItems();
+        setUserItems(await retrieveNeeded(user, await retrieveUserItems(retrievedItems)));
         setLoading(false);
-    }*/
-
-    async function retrieveItemsInfo(){
-        return new Promise(function(resolve, reject) {
-            getAllItems().then(response => {
-                resolve(response.data);
-            }).catch(e => {
-                console.log(e);
-            });
-        })
     };
 
-    async function retrieveUserItems(){
+    async function retrieveUserItems(retrievedItems){
         return new Promise(function(resolve, reject) {         
             if(user){
                 getUserItems().then(response => {
@@ -256,7 +244,7 @@ function Items(){
                 const localUserItemData = JSON.parse(localStorage.getItem("userItems"));
                 if(!localUserItemData || localUserItemData.length === 0){
                     const newUserItems = [];
-                    items.forEach(element => {
+                    retrievedItems.forEach(element => {
                         const newUserItem = element;
                         newUserItem.Users = [];
                         newUserItem.Users[0]= {};
@@ -293,7 +281,7 @@ function Items(){
         return true;
     }
 
-    async function checkForgeNum(newValue, row, column){
+    function checkForgeNum(newValue, row, column){
         if (isNaN(newValue)) {
             return {
               valid: false,
@@ -306,8 +294,6 @@ function Items(){
                 message: 'Number should not be lower than 0'
             };
         }
-        
-        setUserItems(await checkForge(userItems));
         
         return true;
     }
@@ -328,14 +314,13 @@ function Items(){
                 console.log(e);
             });
         }else{
-            const indexOfItem = itemData.findIndex(itema => itema.item_id === value.item_id);
-            const newUserItem = itemData[indexOfItem];
-                set(newUserItem.Users[0], 'UserItems.amount', value.amount);
-                set(newUserItem.Users[0], 'UserItems.forge', value.forge);
-                const newUserItems = cloneDeep(userItems);
-                newUserItems.push(newUserItem);
-                setUserItems(newUserItems);
-                localStorage.setItem("userItems", JSON.stringify(newUserItems));
+            const indexOfItem = userItems.findIndex(item => item.item_id === value.item_id);
+            console.log(itemData);
+            const newUserItems = cloneDeep(userItems);
+            set(newUserItems[indexOfItem].Users[0], 'UserItems.amount', value.amount);
+            set(newUserItems[indexOfItem].Users[0], 'UserItems.forge', value.forge);
+            setUserItems(newUserItems);
+            localStorage.setItem("userItems", JSON.stringify(newUserItems));
         }
     }; 
 
@@ -343,6 +328,7 @@ function Items(){
         setChanged(false);
         itemData.forEach(UpdateUserItem);
         setItemData([]);
+        retrieveStuff();
     }
 
     function imageFormatter(cell, row, rowIndex, formatExtraData) {
@@ -356,7 +342,8 @@ function Items(){
     }
 
     return(
-        <>
+        <Container fluid className ="outer-container">
+        <Container fluid className="inner-container">
         <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <GiSwapBag size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
@@ -387,11 +374,17 @@ function Items(){
                                     mode: 'click',
                                     blurToSave: true,
                                     afterSaveCell: (oldValue, newValue, row, column) => {
-                                        const indexOfItem = itemData.findIndex(userItem => userItem.item_id === row.Users[0].UserItems.item_id);
+                                        const indexOfItem = itemData.findIndex(userItem => userItem.item_id === row.item_id);
+                                        const value = {
+                                            item_id: row.item_id,
+                                            amount: row.Users[0].UserItems.amount,
+                                            forge: row.Users[0].UserItems.forge
+                                        };
+                                        console.log(value);
                                         if(indexOfItem !== -1){
-                                            itemData[indexOfItem] = row.Users[0].UserItems;
+                                            itemData[indexOfItem] = value;
                                         }else{
-                                            itemData.push(row.Users[0].UserItems);
+                                            itemData.push(value);
                                         }
                                         setItemData(itemData);
                                         setChanged(true);
@@ -413,10 +406,12 @@ function Items(){
                 </ToolkitProvider>
             </Row>
         </Container>
-        <Button variant="primary" className="position-sticky float-right save-button" onClick={() => saveChanged()} disabled={!changed}>
+        
+        </Container>
+        <Button variant="primary" className="save-button" onClick={() => saveChanged()} disabled={!changed}>
                         Save
         </Button>
-        </>
+        </Container>
     );
 };
 

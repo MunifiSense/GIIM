@@ -3,12 +3,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('UserCharacters', {
-    user_character_id: {
-      autoIncrement: true,
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-      primaryKey: true
-    },
     user_id: {
       type: DataTypes.STRING(50),
       allowNull: false,
@@ -16,7 +10,8 @@ module.exports = function(sequelize, DataTypes) {
         model: 'Users',
         key: 'user_id'
       },
-      unique: "FK_UserCharacters_Users"
+      unique: "FK_UserCharacters_Users",
+      primaryKey: true
     },
     character_id: {
       type: DataTypes.INTEGER(11),
@@ -25,7 +20,8 @@ module.exports = function(sequelize, DataTypes) {
         model: 'Characters',
         key: 'character_id'
       },
-      unique: "UserCharacters_ibfk_1"
+      unique: "UserCharacters_ibfk_1",
+      primaryKey: true
     },
     level: {
       type: DataTypes.INTEGER(11),

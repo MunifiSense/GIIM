@@ -1204,18 +1204,20 @@ export async function checkForge(userItems){
                 }
             }else{
                 item = findItemIndexFromItemGroup(userItems, userItems[i].item_group, userItems[i].rarity-1);
-                if(userItems[item].Users[0].UserItems.amount > 3){
+                if(userItems[item].Users[0].UserItems.amount >= 3){
                     userItems[i].canForge = Math.floor(userItems[item].Users[0].UserItems.amount/3);
                 }
             }
 
             userItems[i].totalAmount = userItems[i].Users[0].UserItems.amount + userItems[i].Users[0].UserItems.forge;
-            userItems[item].totalAmount = userItems[item].Users[0].UserItems.amount - userItems[i].Users[0].UserItems.forge;
+            userItems[item].needed += userItems[i].Users[0].UserItems.forge*3;
         }else{
-            userItems[i].totalAmount = userItems[i].Users[0].UserItems.amount;
             userItems[i].canForge = -1;
             userItems[i].Users[0].UserItems.forge = -1;
         }
+    }
+    for(i = 0; i<userItems.length; i++){
+        userItems[i].totalAmount = userItems[i].Users[0].UserItems.amount - userItems[i].needed;
     }
     return userItems;
 }

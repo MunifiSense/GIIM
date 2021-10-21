@@ -17,7 +17,14 @@
   .footer {
       display: none !important;
   }
+  .inner-container{
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  html { font-size: 0.9rem; }
 }
+
+
 
 .App-header {
   font-family: Roboto; 
@@ -85,6 +92,7 @@
   left: 0;
   top: 52px;
   height: 100vh;
+  z-index: 3;
 }
 
 .sidebar-collapse{
@@ -116,13 +124,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  width: fit-content;
 }
 
 .content{
   padding-top: 80px;
-  padding-left: 80px;
-  padding-right: 80px;
   flex-grow: 1;
+  width: fit-content;
 }
 
 .navbar, .content, .footer {
@@ -131,7 +139,6 @@ body {
 
 .no-shift{
   transition: margin-left 0.35s ease;
-  margin-left: 0px;
 }
 
 .shift{
@@ -265,7 +272,7 @@ p{
   border: none;
   border-radius: 5px;
   box-shadow: 0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12);
-  min-width: 1000px;
+  min-width: 1275px;
   margin-bottom: 10px;
   padding-top: 10px;
 }
@@ -284,6 +291,7 @@ p{
   background-color: white;
   font-family: Roboto;
   color: black;
+  z-index: 2;
   border-radius: 5px !important;
 }
 
@@ -292,10 +300,8 @@ p{
 }
 
 .footer {
-  background-color: #212121;
   margin-top: 10px;
-  padding-top: 10px;
-  padding-bottom: 20px;
+  position: sticky;
   z-index: 2;
 }
 
@@ -337,11 +343,24 @@ p{
 
 .save-button{
   bottom: 10px; 
-  right: 10px; 
-  margin-right: -100px;
+  right: 10px;
+  position: sticky;
+  float: right; 
 }
 
 .custom-option:hover{
   background-color:#eeeeee;
   user-select: none;
+}
+
+.inner-container{
+  min-width: min-content;
+  padding-left: 80px;
+  padding-right: 80px;
+  right: 0px;
+}
+
+.outer-container{
+  padding: 0px;
+  margin: 0px;
 }

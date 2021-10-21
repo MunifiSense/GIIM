@@ -21,6 +21,7 @@ const db = require("./models");
 
 // simple route
 app.get("/", (req, res) => {
+	console.log(req.header);
   res.json({ message: `Welcome to the GIMM DB.`});
 });
 

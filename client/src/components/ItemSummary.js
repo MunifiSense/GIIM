@@ -457,29 +457,26 @@ function Items(){
 
     if(loading){
         return(
-        <>
-            <Container fluid>
-                <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
-                    <div style={{display: 'flex', alignItems: 'center'}}>
-                        <FaGem size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
-                        <h1 style={{display: "inline-block"}}>Needed Item Summary</h1>
-                    </div>   
-                </Row>
-                <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
-                    <p>What you entered all that information for!</p>
-                </Row>
-                <Row className="justify-content-md-center">
-                    <p>Loading...</p>
-                    <Spinner variant="primary" animation="border" role="status">
-                        <span className="sr-only">Loading...</span>
-                    </Spinner>
-                </Row>
-            </Container>
-        </>     
+        <Container fluid className="inner-container">
+            <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                    <FaGem size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
+                    <h1 style={{display: "inline-block"}}>Needed Item Summary</h1>
+                </div>   
+            </Row>
+            <Row className="justify-content-md-center" style={{paddingLeft: '10px'}}>
+                <p>What you entered all that information for!</p>
+            </Row>
+            <Row className="justify-content-md-center">
+                <p>Loading...</p>
+                <Spinner variant="primary" animation="border" role="status">
+                    <span className="sr-only">Loading...</span>
+                </Spinner>
+            </Row>
+        </Container>    
     );}
     return(
-        <>
-        <Container fluid>
+        <Container fluid className="inner-container">
             <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
                 <div style={{display: 'flex', alignItems: 'center'}}>
                     <FaGem size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
@@ -1014,7 +1011,6 @@ function Items(){
                 </Card>
             </Accordion>
         </Container>
-        </>
     );
 };
 

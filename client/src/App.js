@@ -6,6 +6,7 @@ import { GiSwapBag } from 'react-icons/gi';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { RiSwordFill } from 'react-icons/ri';
+import { SiKoFi } from 'react-icons/si';
 import Button from 'react-bootstrap/Button';
 import Navbar from 'react-bootstrap/Navbar';
 import { Switch, Route, Link } from "react-router-dom";
@@ -180,7 +181,7 @@ function App (){
               <div style={{position: 'fixed', right: '10px'}}>
                 {!user? 
                   <GoogleLogin
-                      clientId="871403107294-7if7ber7cm2po4t5nnrvvdogpsp09t0l.apps.googleusercontent.com"
+                      clientId=""
                       buttonText="Login with Google"
                       onSuccess={loginSuccess}
                       onFailure={loginFail}
@@ -189,7 +190,7 @@ function App (){
                       isSignedIn={true}
                   /> : 
                   <GoogleLogout
-                    clientId="871403107294-7if7ber7cm2po4t5nnrvvdogpsp09t0l.apps.googleusercontent.com"
+                    clientId=""
                     buttonText="Logout"
                     onLogoutSuccess={logout}
                     theme={'dark'}
@@ -250,25 +251,33 @@ function App (){
           </userContext.Provider>
         </div>
         <div className={menuOpen ? 
-          (collapsed? "footer shift-collapsed" : "footer shift" )
-          : "footer no-shift"}>
+                (collapsed? 
+                  "footer shift-collapsed" : "footer shift" )
+                : "footer no-shift"}>
             <Container fluid>
-              <Row>
-                <Col md={{ span: 3, offset: 1 }} style={{marginTop: '20px'}}>
+              <Row className = "justify-content-md-center"
+                style={{position: 'sticky', backgroundColor: '#212121', height: '100%', paddingTop: '10px', paddingBottom: '10px'}}>
+                <Col md={{ span: 2}} style={{marginTop: '20px'}}>
                     <div style={{display: 'inline-block'}}>
                       <img src={process.env.PUBLIC_URL + '/logo192.png'} style={{height: '64px', width: '64px', marginRight: "10px"}} alt="Website logo that looks like a heart"/>
                     </div>
                     <p style={{display: 'inline-block'}}><b>GIM</b></p> <br></br>
                     <p><b>Genshin Item Manager</b> is not affiliated with or endorsed by miHoYo.</p>
                 </Col>
-                <Col md={{ span: 3, offset: 2 }} style={{marginTop: '20px'}}>
+                <Col md={{ span: 2, offset: 1}} style={{marginTop: '20px'}}>
                     <p><b>Links</b></p>              
                     <a href="mailto:GenshinItemManager@outlook.com">Contact</a>
                 </Col>
-                <Col md={{ span: 3}} style={{marginTop: '20px'}}>
+                <Col md={{ span: 2}} style={{marginTop: '20px'}}>
                     <p><b>Social Links</b></p>
-                    <a href="https://discordapp.com/users/Muni#4321">Discord</a><br></br>
-                    <a href="https://twitter.com/MunifiS">Twitter</a>
+                    <a href="https://discordapp.com/">Discord</a><br></br>
+                    <a href="https://twitter.com/">Twitter</a>
+                </Col>
+                <Col md={{ span: 3}} style={{color: 'white', marginTop: '20px'}}>
+                    If my app has helped you and you would like to donate to help with development and web/server hosting fees, I would really appreciate it!
+                    <div style={{textAlign: 'center'}}>
+                      You can donate here: <a href="https://ko-fi.com/"><SiKoFi /> My KoFi</a>
+                    </div>     
                 </Col>
               </Row>
             </Container>

@@ -4,7 +4,7 @@ import {FaHeart} from 'react-icons/fa';
 
 function Home(){
     return(
-        <Container fluid>
+        <Container fluid className="inner-container">
           <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
                 <div style={{display: 'flex', alignItems: 'center'}}>
                     <FaHeart size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>

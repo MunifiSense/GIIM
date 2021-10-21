@@ -46,7 +46,8 @@ function Characters(){
         top: '50px', 
         zIndex: '1', 
         boxShadow: 'inset 1px 0px white, 0 2px white',
-        height: '100px'
+        height: '100px',
+        width: '100px'
     };
 
     const columns = [{
@@ -642,7 +643,8 @@ function Characters(){
     }
 
     return(
-        <>
+        <Container fluid className="outer-container">
+        <Container fluid className="inner-container">
         <Row className="justify-content-md-center" style={{paddingLeft: '10px', paddingTop: '30px'}}>
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <BsFillPeopleFill size='64' color='white' style={{display: "inline-block", verticalAlign: 'middle !important', marginRight: '10px'}}/>
@@ -699,7 +701,7 @@ function Characters(){
                                 <div style={{width: '300px', display: "inline-block"}} >
                                     <SearchBar { ...props.searchProps } className="searchBar"/>
                                 </div>
-                                <div>
+                                <div style={{marginRight: '0px', marginLeft: 'auto'}}>
                                     <div style={{width: '300px', display: "inline-block"}}>
                                         <Select 
                                             className="my-dropdown"
@@ -776,10 +778,12 @@ function Characters(){
             
             
         </Container>
-        <Button variant="primary" className="position-sticky float-right save-button" onClick={() => saveChanged()} disabled={!changed}>
+        
+        </Container>
+        <Button variant="primary" className="save-button" onClick={() => saveChanged()} disabled={!changed}>
                         Save
             </Button>
-        </>
+        </Container>
     );
 };
 

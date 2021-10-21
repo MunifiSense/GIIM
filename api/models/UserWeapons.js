@@ -3,12 +3,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('UserWeapons', {
-    user_weapon_id: {
-      autoIncrement: true,
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-      primaryKey: true
-    },
     user_id: {
       type: DataTypes.STRING(50),
       allowNull: false,
@@ -16,7 +10,8 @@ module.exports = function(sequelize, DataTypes) {
         model: 'Users',
         key: 'user_id'
       },
-      unique: "FK_UserWeapons_Users"
+      unique: "FK_UserWeapons_Users",
+      primaryKey: true
     },
     weapon_id: {
       type: DataTypes.INTEGER(11),
@@ -25,7 +20,8 @@ module.exports = function(sequelize, DataTypes) {
         model: 'Weapons',
         key: 'weapon_id'
       },
-      unique: "FK_UserWeapons_munimoe_GIIM.Weapons"
+      unique: "FK_UserWeapons_munimoe_GIIM.Weapons",
+      primaryKey: true
     },
     level: {
       type: DataTypes.INTEGER(11),
